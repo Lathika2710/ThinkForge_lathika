@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="text-center my-3">
+ <div class="avatar avatar-lg mx-auto"><i class="bi bi-person-fill"></i></div>
+ <h3 class="mt-2 mb-0">{{ g.user.name }}</h3>
+ <div class="small text-muted">{{ g.user.email }}{% if wp %} · {{ t('cat_' + wp.category.name) }} {% if wp.verified %}<i class="bi bi-patch-check-fill text-primary"></i>{% endif %}{% endif %}</div>
+</div>
+<form method="post" class="card job"><div class="card-body">
+ <div class="row g-3">
+  <div class="col-6"><label class="form-label">{{ t('phone') }}</label><input name="phone" class="form-control" value="{{ g.user.phone or '' }}" inputmode="numeric" minlength="10" maxlength="15" required></div>
+  <div class="col-6"><label class="form-label">{{ t('city') }}</label><input name="city" class="form-control" value="{{ g.user.city or '' }}"></div>
+  {% if wp %}
+  <div class="col-6"><label class="form-label">{{ t('starting_price') }}</label><input type="number" name="starting_price" min="1" class="form-control" value="{{ wp.starting_price or '' }}" required></div>
+  <div class="col-6"><label class="form-label">{{ t('experience') }}</label><input type="number" name="experience" min="0" max="60" class="form-control" value="{{ wp.experience_years or 0 }}" required></div>
+  <div class="col-12"><label class="form-label">{{ t('skills') }}</label><input name="skills" class="form-control" maxlength="250" value="{{ wp.skills or '' }}"></div>
+  <div class="col-12"><label class="form-label">{{ t('service_areas') }}</label><input name="service_areas" class="form-control" maxlength="250" value="{{ wp.service_areas or '' }}"></div>
+  {% else %}
+  <div class="col-12"><label class="form-label">{{ t('area') }}</label><input name="area" class="form-control" value="{{ g.user.area or '' }}"></div>
+  <div class="col-12"><label class="form-label">{{ t('address') }}</label><input name="address" class="form-control" value="{{ g.user.address or '' }}"></div>
+  {% endif %}
+ </div>
+ <button class="btn btn-primary btn-lg w-100 mt-3">{{ t('save') }}</button>
+</div></form>
+<a class="btn btn-outline-secondary w-100 mt-3" href="{{ url_for('main.logout') }}"><i class="bi bi-box-arrow-right"></i> {{ t('logout') }}</a>
+{% endblock %}

@@ -18,14 +18,14 @@ Logins: admin `admin@example.com` / `ChangeMe123` (from `.env`); customer `custo
 workers `ravi.sample@example.com` (Plumber), `sunita.sample@example.com` (Electrician),
 `imran.sample@example.com` (Carpenter), `meena.sample@example.com` (Cleaner) – password `Sample123`.
 
-## Landing page
-The first visit asks **Customer or Worker**. Customer → home page with search and SOS. Worker → worker login,
-then the dashboard. The choice is remembered until logout; "Switch role" in the top bar resets it.
-
-## Worker dashboard
-Stats (today's jobs, upcoming, completed, earnings, awaiting payment, reliability), jobs grouped into
-**New requests / Active jobs / History**, recent reviews, tips, and an **Edit profile** form (phone, city, experience,
-price, skills, service areas). Workers do not see "Find workers" or SOS in the navigation.
+## How it looks (phone-first, one action at a time)
+* First visit asks **Customer or Worker**; the choice is remembered until logout.
+* Customer: tap a service icon → **Now** (SOS to every available worker of that type) or **Pick a day** (worker list → one Book
+  button → date, time, price prefilled from the worker's rate). Bottom bar: Home · Bookings · Me.
+* Worker: one big availability switch, then SOS, Today, New requests, Upcoming. Bottom bar: Jobs · Money · Me.
+* Every booking card shows **one** big button for the next step; counter-offer, extra charge, decline and cancel sit under "More".
+  The cancellation rule is shown only there, as one sentence, at the moment it matters.
+* Status is colour + icon (yellow hourglass waiting, blue van on the way, green tick done, red SOS).
 
 ## 5-minute demo order
 1. Home: type the problem, pick the service → Find workers (match % + reasons)

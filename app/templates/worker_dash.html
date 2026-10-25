@@ -2,87 +2,41 @@
 {% block body_attrs %}data-refresh="8000"{% endblock %}
 {% block content %}
 {% set view = 'worker' %}
-<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
- <div>
-  <h3 class="mb-0">{{ t('worker_dash') }}</h3>
-  <div class="text-muted small">{{ g.user.name }} · {{ t('cat_' + wp.category.name) }} {% if wp.verified %}<i class="bi bi-patch-check-fill text-primary" title="{{ t('verified') }}"></i>{% endif %}</div>
- </div>
- <div class="d-flex flex-wrap gap-2">
-  <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#profileForm"><i class="bi bi-pencil"></i> {{ t('edit_profile') }}</button>
-  {% if wp.verified %}<a class="btn btn-sm btn-outline-secondary" href="{{ url_for('main.worker_public', wid=wp.id) }}" target="_blank"><i class="bi bi-box-arrow-up-right"></i> {{ t('public_profile') }}</a>{% endif %}
-  <form method="post" action="{{ url_for('main.worker_availability') }}">
-   <button class="btn btn-sm {{ 'btn-success' if wp.available else 'btn-outline-secondary' }}">
-    <i class="bi bi-circle-fill small"></i> {{ t('set_unavailable') if wp.available else t('set_available') }}</button></form>
- </div>
-</div>
-{% if not wp.verified %}<div class="alert alert-info">{{ t('verification_pending') }}</div>{% endif %}
+{# ---------- one switch ---------- #}
+<form method="post" action="{{ url_for('main.worker_availability') }}" class="d-grid my-3">
+ <button class="btn btn-xl {{ 'btn-success' if wp.available else 'btn-outline-secondary' }}">
+  <i class="bi {{ 'bi-toggle-on' if wp.available else 'bi-toggle-off' }}"></i> {{ t('im_available') if wp.available else t('not_available') }}</button>
+</form>
+{% if not wp.verified %}<div class="alert alert-info py-2 small">{{ t('verification_pending') }}</div>{% endif %}
 
-{# ---------- edit profile (collapsed by default) ---------- #}
-<div class="collapse mb-3" id="profileForm">
- <form class="card card-body shadow-sm" method="post" action="{{ url_for('main.worker_profile_edit') }}" autocomplete="off">
-  <h5 class="mb-3"><i class="bi bi-pencil"></i> {{ t('edit_profile') }}</h5>
-  <div class="row g-3">
-   <div class="col-md-4"><label class="form-label">{{ t('phone') }}</label><input name="phone" class="form-control" value="{{ g.user.phone or '' }}" inputmode="numeric" minlength="10" maxlength="15" required></div>
-   <div class="col-md-4"><label class="form-label">{{ t('city') }}</label><input name="city" class="form-control" value="{{ wp.city or '' }}"></div>
-   <div class="col-md-2"><label class="form-label">{{ t('experience') }}</label><input type="number" name="experience" min="0" max="60" class="form-control" value="{{ wp.experience_years or 0 }}" required></div>
-   <div class="col-md-2"><label class="form-label">{{ t('starting_price') }}</label><input type="number" name="starting_price" min="1" class="form-control" value="{{ wp.starting_price or '' }}" required></div>
-   <div class="col-12"><label class="form-label">{{ t('skills') }}</label><input name="skills" class="form-control" maxlength="250" value="{{ wp.skills or '' }}"></div>
-   <div class="col-12"><label class="form-label">{{ t('service_areas') }}</label><input name="service_areas" class="form-control" maxlength="250" value="{{ wp.service_areas or '' }}"><div class="form-text">{{ t('tip_areas') }}</div></div>
+{# ---------- SOS first ---------- #}
+{% for s in sos_open %}
+ <div class="card job border-danger mb-3"><div class="card-body">
+  <div class="d-flex align-items-center gap-3 mb-2">
+   <div class="status-icon text-danger"><i class="bi bi-exclamation-triangle-fill"></i></div>
+   <div class="flex-grow-1"><div class="fw-bold">{{ t('cat_' + s.category.name) }} <span class="badge bg-danger">SOS</span></div>
+    <div class="small text-muted">{{ s.created_at|dt }}<br><i class="bi bi-geo-alt"></i> {{ s.address }}</div></div>
+   <div class="fs-5 fw-bold">₹{{ wp.starting_price }}</div>
   </div>
-  <div class="mt-3"><button class="btn btn-primary"><i class="bi bi-check-lg"></i> {{ t('save') }}</button></div>
- </form>
-</div>
+  <form method="post" action="{{ url_for('main.sos_accept', bid=s.id) }}" class="d-grid"><button class="btn btn-danger btn-lg">{{ t('accept_sos') }}</button></form>
+ </div></div>
+{% endfor %}
 
-{# ---------- stats ---------- #}
-<div class="row g-2 mb-3">
- <div class="col-6 col-md-2"><div class="card stat-card h-100"><div class="card-body py-2"><div class="stat-num text-primary">{{ stats.today }}</div><div class="small text-muted">{{ t('stat_today') }}</div></div></div></div>
- <div class="col-6 col-md-2"><div class="card stat-card h-100"><div class="card-body py-2"><div class="stat-num">{{ stats.upcoming }}</div><div class="small text-muted">{{ t('stat_upcoming') }}</div></div></div></div>
- <div class="col-6 col-md-2"><div class="card stat-card h-100"><div class="card-body py-2"><div class="stat-num text-success">{{ stats.completed }}</div><div class="small text-muted">{{ t('stat_completed') }}</div></div></div></div>
- <div class="col-6 col-md-2"><div class="card stat-card h-100"><div class="card-body py-2"><div class="stat-num text-success">₹{{ stats.earnings }}</div><div class="small text-muted">{{ t('stat_earnings') }}</div></div></div></div>
- <div class="col-6 col-md-2"><div class="card stat-card h-100"><div class="card-body py-2"><div class="stat-num text-warning">₹{{ stats.pending_pay }}</div><div class="small text-muted">{{ t('stat_pending_pay') }}</div></div></div></div>
- <div class="col-6 col-md-2"><div class="card stat-card h-100"><div class="card-body py-2"><div class="stat-num">{{ wp.reliability }}%</div><div class="small text-muted">{{ t('reliability') }} · {% if wp.review_count %}<span class="stars">★</span>{{ wp.avg_rating }}{% else %}{{ t('no_reviews') }}{% endif %}</div></div></div></div>
-</div>
-<div class="alert alert-warning small"><b><i class="bi bi-shield-exclamation"></i> {{ t('policy_title') }}:</b> {{ t('policy_generic', h=cfg.FREE_CANCEL_HOURS, p=cfg.LATE_FEE_PERCENT, f=cfg.TRAVEL_FEE) }} {{ t('worker_cancel_note') }}</div>
+<h5 class="section"><i class="bi bi-sun"></i> {{ t('today') }}</h5>
+{% for b in groups.today %}{% include '_booking.html' %}{% else %}<p class="text-muted small">{{ t('nothing_today') }}</p>{% endfor %}
 
-<div class="row g-4">
- <div class="col-lg-8">
-  {# ---------- SOS ---------- #}
-  {% if wp.verified %}
-  <h5 class="text-danger"><i class="bi bi-exclamation-triangle-fill"></i> {{ t('sos_requests') }}</h5>
-  {% for s in sos_open %}
-   <div class="card border-danger mb-2"><div class="card-body d-flex justify-content-between align-items-center">
-    <div><b>{{ t('cat_' + s.category.name) }}</b> · {{ s.created_at|dt }}<br><span class="small text-muted"><i class="bi bi-geo-alt"></i> {{ s.address }}</span></div>
-    <form method="post" action="{{ url_for('main.sos_accept', bid=s.id) }}"><button class="btn btn-danger">{{ t('accept_sos') }}</button></form>
-   </div></div>
-  {% else %}<p class="text-muted small">{{ t('no_sos') }}</p>{% endfor %}
-  {% endif %}
+{% if groups.requests %}
+<h5 class="section"><i class="bi bi-inbox"></i> {{ t('new_requests') }} <span class="badge bg-warning text-dark">{{ groups.requests|length }}</span></h5>
+{% for b in groups.requests %}{% include '_booking.html' %}{% endfor %}
+{% endif %}
 
-  {# ---------- new requests ---------- #}
-  <h5 class="mt-4"><i class="bi bi-inbox"></i> {{ t('new_requests') }} {% if groups.requests %}<span class="badge bg-warning text-dark">{{ groups.requests|length }}</span>{% endif %}</h5>
-  {% for b in groups.requests %}{% include '_booking.html' %}{% else %}<p class="text-muted small">{{ t('no_requests') }}</p>{% endfor %}
+{% if groups.upcoming %}
+<h5 class="section"><i class="bi bi-calendar-event"></i> {{ t('upcoming') }}</h5>
+{% for b in groups.upcoming %}{% include '_booking.html' %}{% endfor %}
+{% endif %}
 
-  {# ---------- active jobs ---------- #}
-  <h5 class="mt-4"><i class="bi bi-briefcase"></i> {{ t('active_jobs') }} {% if groups.active %}<span class="badge bg-primary">{{ groups.active|length }}</span>{% endif %}</h5>
-  {% for b in groups.active %}{% include '_booking.html' %}{% else %}<p class="text-muted small">{{ t('no_active') }}</p>{% endfor %}
-
-  {# ---------- history (collapsed) ---------- #}
-  <h5 class="mt-4"><i class="bi bi-clock-history"></i> {{ t('history') }}
-   {% if groups.history %}<button class="btn btn-sm btn-outline-secondary ms-2" type="button" data-bs-toggle="collapse" data-bs-target="#history">{{ t('show_history') }} ({{ groups.history|length }})</button>{% endif %}</h5>
-  {% if groups.history %}<div class="collapse" id="history">{% for b in groups.history %}{% include '_booking.html' %}{% endfor %}</div>
-  {% else %}<p class="text-muted small">{{ t('no_history') }}</p>{% endif %}
- </div>
-
- <div class="col-lg-4">
-  {# ---------- recent reviews ---------- #}
-  <h5><i class="bi bi-star"></i> {{ t('recent_reviews') }}</h5>
-  {% for r in reviews %}<div class="card card-body py-2 mb-2"><div><span class="stars">{{ '★' * r.rating }}{{ '☆' * (5 - r.rating) }}</span> <span class="small text-muted">{{ r.customer.name }} · {{ r.created_at|dt }}</span></div>{% if r.comment %}<div class="small">{{ r.comment }}</div>{% endif %}</div>
-  {% else %}<p class="text-muted small">{{ t('no_reviews') }}</p>{% endfor %}
-
-  {# ---------- tips ---------- #}
-  <h5 class="mt-4"><i class="bi bi-lightbulb"></i> {{ t('quick_tips') }}</h5>
-  <ul class="small text-muted ps-3">
-   <li>{{ t('tip_photo') }}</li><li>{{ t('tip_areas') }}</li><li>{{ t('tip_reliable') }}</li>
-  </ul>
- </div>
-</div>
+{% if groups.waiting %}
+<h5 class="section text-muted"><i class="bi bi-hourglass"></i> {{ t('waiting') }}</h5>
+{% for b in groups.waiting %}{% include '_booking.html' %}{% endfor %}
+{% endif %}
 {% endblock %}

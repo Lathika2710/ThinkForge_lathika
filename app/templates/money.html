@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block content %}
+{% set view = 'worker' %}
+<h2 class="text-center my-3">{{ t('money_title') }}</h2>
+<div class="row g-2 mb-3 text-center">
+ <div class="col-4"><div class="card stat"><div class="stat-num text-success">₹{{ stats.earned }}</div><div class="small text-muted">{{ t('earned') }}</div></div></div>
+ <div class="col-4"><div class="card stat"><div class="stat-num text-warning">₹{{ stats.awaiting }}</div><div class="small text-muted">{{ t('awaiting') }}</div></div></div>
+ <div class="col-4"><div class="card stat"><div class="stat-num">{{ stats.done }}</div><div class="small text-muted">{{ t('jobs_done') }}</div></div></div>
+</div>
+<div class="text-center small text-muted mb-3">{{ t('reliability') }} {{ wp.reliability }}% · {% if wp.review_count %}<span class="stars">★</span> {{ wp.avg_rating }} ({{ wp.review_count }}){% else %}{{ t('no_reviews') }}{% endif %}</div>
+{% for b in rows %}{% include '_booking.html' %}{% else %}<p class="text-muted text-center">{{ t('no_money') }}</p>{% endfor %}
+{% endblock %}

@@ -62,6 +62,13 @@ def index():
     return render_template("index.html", cats=Category.query.all())
 
 
+@bp.route("/need/<int:cid>")
+def need(cid):
+    """Step 2 of tap-to-book: Now (SOS) or Pick a day (browse workers)."""
+    cat = db.session.get(Category, cid) or abort(404)
+    return render_template("need.html", cat=cat)
+
+
 @bp.route("/role/<role>")
 def choose_role(role):
     """Role picker on the landing page: remembers the choice and sends the visitor to the right page."""
@@ -154,7 +161,8 @@ def logout():
 def workers():
     cats = Category.query.all()
     cid = to_int(request.args.get("category"), 1, 10**6)
-    area = request.args.get("area", "")
+    # Area comes from the customer's saved profile; no typing needed.
+    area = (g.user.area or g.user.city or "") if g.user and g.user.role == "customer" else request.args.get("area", "")
     q = WorkerProfile.query.filter_by(verified=True)
     if cid:
         q = q.filter_by(category_id=cid)
@@ -163,7 +171,8 @@ def workers():
         score, reasons = match(wp, area)
         rows.append((wp, score, reasons))
     rows.sort(key=lambda r: (not r[0].available, -r[1]))
-    return render_template("workers.html", rows=rows, cats=cats, cid=cid, area=area)
+    cat = db.session.get(Category, cid) if cid else None
+    return render_template("workers.html", rows=rows, cats=cats, cid=cid, cat=cat, area=area)
 
 
 @bp.route("/w/<int:wid>")
@@ -312,41 +321,16 @@ def worker_dash():
     if wp.verified and wp.available:
         sos_open = Booking.query.filter_by(status="sos_open", category_id=wp.category_id).order_by(Booking.created_at).all()
     # Strictly bookings assigned to THIS worker.
-    rows = Booking.query.filter_by(worker_id=wp.id).order_by(Booking.start.desc()).all()
+    rows = Booking.query.filter_by(worker_id=wp.id).order_by(Booking.start).all()
     today = datetime.now().date()
+    active = [b for b in rows if b.status in ("confirmed", "travelling", "in_progress")]
     groups = dict(
-        requests=[b for b in rows if b.status in ("pending", "countered")],
-        active=sorted((b for b in rows if b.status in ("confirmed", "travelling", "in_progress")), key=lambda b: b.start),
-        history=[b for b in rows if b.status in ("completed", "paid", "cancelled", "declined")],
+        requests=[b for b in rows if b.status == "pending"],
+        today=[b for b in active if b.start.date() <= today],
+        upcoming=[b for b in active if b.start.date() > today],
+        waiting=[b for b in rows if b.status in ("countered", "completed")],
     )
-    stats = dict(
-        today=sum(1 for b in groups["active"] if b.start.date() == today),
-        upcoming=sum(1 for b in groups["active"] if b.start.date() > today),
-        completed=sum(1 for b in rows if b.status in ("completed", "paid")),
-        earnings=sum(b.total for b in rows if b.status == "paid"),
-        pending_pay=sum(b.total for b in rows if b.status == "completed"),
-    )
-    reviews = Review.query.filter_by(worker_id=wp.id).order_by(Review.created_at.desc()).limit(3).all()
-    return render_template("worker_dash.html", wp=wp, sos_open=sos_open, groups=groups, stats=stats, reviews=reviews)
-
-
-@bp.route("/worker/profile", methods=["POST"])
-@login_required("worker")
-def worker_profile_edit():
-    wp, f = g.user.profile, request.form
-    price, exp = to_int(f.get("starting_price")), to_int(f.get("experience"), 0, 60)
-    phone = f.get("phone", "").strip()
-    if not price or exp is None or not (phone.isdigit() and 10 <= len(phone) <= 15):
-        msg("invalid_input", "danger")
-    else:
-        wp.starting_price, wp.experience_years = price, exp
-        wp.skills = f.get("skills", "").strip()[:250]
-        wp.service_areas = f.get("service_areas", "").strip()[:250]
-        wp.city = g.user.city = f.get("city", "").strip()[:80]
-        g.user.phone = phone
-        db.session.commit()
-        msg("profile_saved", "success")
-    return redirect(url_for("main.worker_dash"))
+    return render_template("worker_dash.html", wp=wp, sos_open=sos_open, groups=groups)
 
 
 @bp.route("/worker/availability", methods=["POST"])
@@ -355,6 +339,44 @@ def worker_availability():
     g.user.profile.available = not g.user.profile.available
     db.session.commit()
     return redirect(url_for("main.worker_dash"))
+
+
+@bp.route("/worker/money")
+@login_required("worker")
+def worker_money():
+    wp = g.user.profile
+    rows = Booking.query.filter(Booking.worker_id == wp.id, Booking.status.in_(("completed", "paid"))).order_by(Booking.start.desc()).all()
+    stats = dict(earned=sum(b.total for b in rows if b.status == "paid"),
+                 awaiting=sum(b.total for b in rows if b.status == "completed"), done=len(rows))
+    return render_template("money.html", wp=wp, rows=rows, stats=stats)
+
+
+@bp.route("/me", methods=["GET", "POST"])
+@login_required()
+def me():
+    u = g.user
+    wp = u.profile if u.role == "worker" else None
+    if request.method == "POST":
+        f = request.form
+        phone = f.get("phone", "").strip()
+        ok = phone.isdigit() and 10 <= len(phone) <= 15
+        if wp:
+            price, exp = to_int(f.get("starting_price")), to_int(f.get("experience"), 0, 60)
+            ok = ok and price and exp is not None
+        if not ok:
+            msg("invalid_input", "danger")
+        else:
+            u.phone, u.city = phone, f.get("city", "").strip()[:80]
+            if wp:
+                wp.starting_price, wp.experience_years, wp.city = price, exp, u.city
+                wp.skills = f.get("skills", "").strip()[:250]
+                wp.service_areas = f.get("service_areas", "").strip()[:250]
+            else:
+                u.area, u.address = f.get("area", "").strip()[:80], f.get("address", "").strip()[:250]
+            db.session.commit()
+            msg("profile_saved", "success")
+        return redirect(url_for("main.me"))
+    return render_template("me.html", wp=wp)
 
 
 # ---------- booking actions ----------

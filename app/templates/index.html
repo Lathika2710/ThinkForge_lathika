@@ -1,21 +1,8 @@
 {% extends 'base.html' %}
 {% block content %}
-<section class="hero text-center mb-4">
- <h1 class="fw-bold">{{ t('hero_title') }}</h1><p class="lead">{{ t('hero_sub') }}</p>
- {% if not g.user or g.user.role == 'customer' %}<a class="btn btn-danger btn-lg sos-btn" href="{{ url_for('main.sos') }}"><i class="bi bi-exclamation-triangle-fill"></i> {{ t('sos_button') }}</a>{% endif %}
-</section>
-<form class="card card-body shadow-sm mb-4" method="get" action="{{ url_for('main.workers') }}">
- <label class="form-label fw-semibold">{{ t('describe_problem') }}</label>
- <textarea id="problem" class="form-control mb-3" rows="2"></textarea>
- <div class="row g-2">
-  <div class="col-md-5"><select id="category" name="category" class="form-select">
-   {% for c in cats %}<option value="{{ c.id }}" data-name="{{ c.name }}">{{ t('cat_' + c.name) }}</option>{% endfor %}</select></div>
-  <div class="col-md-5"><input name="area" class="form-control" placeholder="{{ t('area') }}"></div>
-  <div class="col-md-2 d-grid"><button class="btn btn-primary">{{ t('search') }}</button></div>
- </div>
-</form>
+<h2 class="text-center my-3">{{ t('choose_service') }}</h2>
 <div class="row g-3">
- {% for c in cats %}<div class="col-6 col-md-3"><a class="card cat-card text-center p-3 h-100 shadow-sm" href="{{ url_for('main.workers', category=c.id) }}">
+ {% for c in cats %}<div class="col-6 col-sm-4"><a class="card cat-card text-center p-3 h-100" href="{{ url_for('main.need', cid=c.id) }}">
   <i class="bi {{ c.icon }}"></i><div class="mt-2 fw-semibold">{{ t('cat_' + c.name) }}</div></a></div>{% endfor %}
 </div>
 {% endblock %}

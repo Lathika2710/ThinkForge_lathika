@@ -1,76 +1,76 @@
-{% macro post(b, action, label, cls='btn-primary') -%}
-<form method="post" action="{{ url_for('main.act', bid=b.id, action=action) }}" class="d-inline"><button class="btn btn-sm {{ cls }}">{{ label }}</button></form>
+{# One card = one big action. Everything else sits behind "More". #}
+{% macro post(b, action, label, cls='btn-primary', big=True) -%}
+<form method="post" action="{{ url_for('main.act', bid=b.id, action=action) }}" class="{{ 'd-grid' if big else 'd-inline' }}"><button class="btn {{ cls }} {{ 'btn-lg' if big else 'btn-sm' }}">{{ label }}</button></form>
 {%- endmacro %}
-{% set colors = {'pending':'warning text-dark','countered':'info text-dark','confirmed':'primary','travelling':'primary','in_progress':'primary','completed':'success','paid':'success','cancelled':'secondary','declined':'secondary','sos_open':'danger'} %}
+{% set ICON = {'pending':'hourglass-split','countered':'arrow-left-right','confirmed':'calendar-check','travelling':'truck','in_progress':'tools',
+               'completed':'check-circle','paid':'check-circle-fill','cancelled':'x-circle','declined':'x-circle','sos_open':'exclamation-triangle-fill'} %}
+{% set COLOR = {'pending':'warning','countered':'info','confirmed':'primary','travelling':'primary','in_progress':'primary',
+                'completed':'success','paid':'success','cancelled':'secondary','declined':'secondary','sos_open':'danger'} %}
 {% set shared = b.status in ('confirmed','travelling','in_progress','completed','paid') %}
-<div class="card mb-3 shadow-sm {{ 'border-danger' if b.is_sos }}"><div class="card-body">
- <div class="d-flex justify-content-between align-items-start">
-  <h5 class="mb-1">{{ t('cat_' + b.category.name) }} {% if b.is_sos %}<span class="badge bg-danger">SOS</span>{% endif %}</h5>
-  <span class="badge bg-{{ colors[b.status] }}">{{ t('st_' + b.status) }}</span>
+{% set price = b.total or b.agreed_price or b.counter_price or b.offered_price %}
+<div class="card job mb-3 {{ 'border-danger' if b.is_sos }}"><div class="card-body">
+ <div class="d-flex align-items-center gap-3 mb-2">
+  <div class="status-icon text-{{ COLOR[b.status] }}"><i class="bi bi-{{ ICON[b.status] }}"></i></div>
+  <div class="flex-grow-1">
+   <div class="fw-bold">{{ t('cat_' + b.category.name) }}{% if b.is_sos %} <span class="badge bg-danger">SOS</span>{% endif %}</div>
+   <div class="small text-muted">{{ t('st_' + b.status) }} · {{ b.start|dt }}</div>
+  </div>
+  {% if price %}<div class="fs-5 fw-bold">₹{{ price }}</div>{% endif %}
  </div>
- <div class="small text-muted mb-2">
-  {% if view == 'customer' %}{% if b.worker %}<i class="bi bi-person-badge"></i> {{ b.worker.user.name }}{% if shared %} · {{ b.worker.user.phone }}{% endif %}{% endif %}
-  {% else %}<i class="bi bi-person"></i> {{ b.customer.name }}{% if shared %} · {{ b.customer.phone }}{% endif %}{% endif %}
-  · <i class="bi bi-calendar-event"></i> {{ b.start|dt }}
-  {% if view == 'worker' and shared and b.address %}<br><i class="bi bi-geo-alt"></i> {{ b.address }}{% endif %}
+ <div class="small mb-2">
+  {% if view == 'customer' %}{% if b.worker %}<i class="bi bi-person-badge"></i> {{ b.worker.user.name }}{% if shared %} · <a href="tel:{{ b.worker.user.phone }}">{{ b.worker.user.phone }}</a>{% endif %}{% endif %}
+  {% else %}<i class="bi bi-person"></i> {{ b.customer.name }}{% if shared %} · <a href="tel:{{ b.customer.phone }}">{{ b.customer.phone }}</a>{% endif %}
+   {% if shared and b.address %}<br><i class="bi bi-geo-alt"></i> {{ b.address }}{% endif %}{% endif %}
+  {% if b.problem and not b.is_sos %}<br>{{ b.problem }}{% endif %}
+  {% if b.photo %}<br><a href="{{ url_for('main.photo', name=b.photo) }}" target="_blank"><img class="thumb" src="{{ url_for('main.photo', name=b.photo) }}" alt=""></a>{% endif %}
  </div>
- {% if not b.is_sos %}<p class="mb-1">{{ b.problem }}</p>{% endif %}
- {% if b.photo %}<a href="{{ url_for('main.photo', name=b.photo) }}" target="_blank"><img class="thumb" src="{{ url_for('main.photo', name=b.photo) }}" alt=""></a>{% endif %}
- <div class="mb-2">
-  {% if b.offered_price %}<span class="me-3">{{ t('offered') }}: ₹{{ b.offered_price }}</span>{% endif %}
-  {% if b.counter_price %}<span class="me-3">{{ t('counter') }}: ₹{{ b.counter_price }}</span>{% endif %}
-  {% if b.agreed_price %}<span class="me-3 fw-semibold">{{ t('agreed') }}: ₹{{ b.agreed_price }}</span>{% endif %}
-  {% if b.addon_status == 'accepted' %}<span class="me-3">+ ₹{{ b.addon_amount }} ({{ b.addon_reason }})</span><b>{{ t('total') }}: ₹{{ b.total }}</b>{% endif %}
- </div>
- {% if b.addon_status == 'proposed' %}<div class="alert alert-info py-2 small">{{ t('addon_proposed', a=b.addon_amount, r=b.addon_reason) }}</div>{% endif %}
- {% set pol = policy_text(b) %}
- {% if pol %}<div class="alert alert-warning py-2 small mb-2"><i class="bi bi-shield-exclamation"></i> <b>{{ t('policy_title') }}:</b> {{ pol }}</div>{% endif %}
+ {% if b.addon_status == 'proposed' %}<div class="alert alert-info py-2 small mb-2">{{ t('addon_proposed', a=b.addon_amount, r=b.addon_reason) }}</div>{% endif %}
 
- {# ---------- worker actions ---------- #}
+ {# ---------- the ONE primary action + what goes behind "More" ---------- #}
+ {% set more = [] %}
  {% if view == 'worker' %}
-  {% if b.status == 'pending' %}
-   <div class="d-flex flex-wrap gap-2 align-items-center">
-    {{ post(b, 'accept', t('accept'), 'btn-success') }}{{ post(b, 'decline', t('decline'), 'btn-outline-danger') }}
-    <form method="post" action="{{ url_for('main.act', bid=b.id, action='counter') }}" class="d-flex gap-1">
-     <input type="number" name="price" min="1" class="form-control form-control-sm" style="width:130px" placeholder="{{ t('counter_price') }}" autocomplete="off" required>
-     <button class="btn btn-sm btn-outline-primary">{{ t('counter_offer') }}</button></form>
-   </div>
-  {% elif b.status == 'countered' %}<span class="text-muted small">{{ t('waiting_customer') }}</span>
-  {% elif b.status in ('confirmed', 'travelling') %}
-   <div class="d-flex flex-wrap gap-2">
-    {% if b.status == 'confirmed' %}{{ post(b, 'travel', t('on_the_way'), 'btn-outline-primary') }}{% endif %}
-    {{ post(b, 'start', t('start_job'), 'btn-primary') }}
-    <form method="post" action="{{ url_for('main.act', bid=b.id, action='wcancel') }}" class="d-flex gap-1">
-     <input name="reason" class="form-control form-control-sm" placeholder="{{ t('cancel_reason') }}">
-     <button class="btn btn-sm btn-outline-danger">{{ t('cancel_btn') }}</button></form>
-   </div><div class="small text-muted mt-1">{{ t('worker_cancel_note') }}</div>
+  {% if b.status == 'pending' %}{{ post(b, 'accept', t('accept'), 'btn-success') }}{% set more = ['counter', 'decline'] %}
+  {% elif b.status == 'confirmed' %}{{ post(b, 'travel', t('on_the_way')) }}{% set more = ['start', 'wcancel'] %}
+  {% elif b.status == 'travelling' %}{{ post(b, 'start', t('start_job')) }}{% set more = ['wcancel'] %}
   {% elif b.status == 'in_progress' %}
-   <div class="d-flex flex-wrap gap-2">
-    {% if b.addon_status != 'proposed' and b.addon_status != 'accepted' %}
-    <form method="post" action="{{ url_for('main.act', bid=b.id, action='addon') }}" class="d-flex gap-1 flex-wrap">
-     <input type="number" name="amount" min="1" class="form-control form-control-sm" style="width:130px" placeholder="{{ t('addon_amount') }}" autocomplete="off" required>
-     <input name="reason" class="form-control form-control-sm" style="width:210px" placeholder="{{ t('addon_reason') }}" required>
-     <button class="btn btn-sm btn-outline-primary">{{ t('propose_addon') }}</button></form>{% endif %}
-    {{ post(b, 'done', t('mark_done'), 'btn-success') }}
-   </div>
-  {% elif b.status == 'completed' %}<span class="text-muted small">{{ t('waiting_customer') }}</span>{% endif %}
-
- {# ---------- customer actions ---------- #}
+   {% if b.addon_status == 'proposed' %}<div class="text-muted small text-center py-2">{{ t('waiting_customer') }}</div>
+   {% else %}{{ post(b, 'done', t('mark_done'), 'btn-success') }}{% if b.addon_status != 'accepted' %}{% set more = ['addon'] %}{% endif %}{% endif %}
+  {% elif b.status in ('countered', 'completed') %}<div class="text-muted small text-center py-2"><i class="bi bi-hourglass"></i> {{ t('waiting_customer') }}</div>{% endif %}
  {% else %}
-  {% if b.status == 'countered' %}
-   <div class="d-flex gap-2">{{ post(b, 'accept_counter', t('accept_counter') + ' ₹' ~ b.counter_price, 'btn-success') }}{{ post(b, 'reject_counter', t('reject_counter'), 'btn-outline-danger') }}</div>
-  {% elif b.status == 'pending' %}<span class="text-muted small">{{ t('waiting_worker') }}</span>{% endif %}
-  {% if b.addon_status == 'proposed' %}<div class="d-flex gap-2 mt-2">{{ post(b, 'accept_addon', t('accept_addon'), 'btn-success') }}{{ post(b, 'reject_addon', t('reject_addon'), 'btn-outline-danger') }}</div>{% endif %}
-  {% if b.status == 'completed' %}
-   <div class="d-flex gap-2 align-items-center">{{ post(b, 'pay', t('confirm_pay'), 'btn-success') }}<span class="small text-muted">{{ t('pay_note') }}</span></div>
-  {% endif %}
-  {% if b.status in ('completed', 'paid') and not b.review %}<a class="btn btn-sm btn-warning mt-2" href="{{ url_for('main.review', bid=b.id) }}"><i class="bi bi-star-fill"></i> {{ t('leave_review') }}</a>{% endif %}
-  {% if b.status in ('pending', 'countered', 'confirmed', 'travelling') %}
-   <form method="post" action="{{ url_for('main.act', bid=b.id, action='cancel') }}" class="d-flex gap-1 mt-2">
-    <input name="reason" class="form-control form-control-sm" placeholder="{{ t('cancel_reason') }}">
-    <button class="btn btn-sm btn-outline-danger text-nowrap">{{ t('cancel_btn') }}</button></form>
-  {% endif %}
-  {% if b.status == 'sos_open' %}<a class="btn btn-sm btn-outline-danger" href="{{ url_for('main.sos_status', bid=b.id) }}">SOS</a>{% endif %}
+  {% if b.addon_status == 'proposed' %}{{ post(b, 'accept_addon', t('accept_addon') + ' ₹' ~ b.addon_amount, 'btn-success') }}{% set more = ['reject_addon'] %}
+  {% elif b.status == 'countered' %}{{ post(b, 'accept_counter', t('accept_counter') + ' ₹' ~ b.counter_price, 'btn-success') }}{% set more = ['reject_counter'] %}
+  {% elif b.status == 'completed' %}{{ post(b, 'pay', t('pay_now', a=b.total), 'btn-success') }}
+  {% elif b.status == 'paid' and not b.review %}<a class="btn btn-warning btn-lg d-block" href="{{ url_for('main.review', bid=b.id) }}"><i class="bi bi-star-fill"></i> {{ t('rate') }}</a>
+  {% elif b.status == 'sos_open' %}<a class="btn btn-outline-danger btn-lg d-block" href="{{ url_for('main.sos_status', bid=b.id) }}">{{ t('st_sos_open') }}</a>{% set more = ['cancel'] %}
+  {% elif b.status == 'pending' %}<div class="text-muted small text-center py-2"><i class="bi bi-hourglass"></i> {{ t('waiting_worker') }}</div>{% set more = ['cancel'] %}
+  {% elif b.status in ('confirmed', 'travelling') %}{% set more = ['cancel'] %}{% endif %}
+ {% endif %}
+
+ {% if more %}
+ <div class="text-center mt-1"><a class="small text-muted" data-bs-toggle="collapse" href="#more{{ b.id }}">{{ t('more') }} <i class="bi bi-chevron-down"></i></a></div>
+ <div class="collapse" id="more{{ b.id }}"><div class="pt-2 d-flex flex-column gap-2">
+  {% for a in more %}
+   {% if a == 'counter' %}
+    <form method="post" action="{{ url_for('main.act', bid=b.id, action='counter') }}" class="d-flex gap-1">
+     <input type="number" name="price" min="1" class="form-control" placeholder="{{ t('counter_price') }}" autocomplete="off" required>
+     <button class="btn btn-outline-primary text-nowrap">{{ t('counter_offer') }}</button></form>
+   {% elif a == 'addon' %}
+    <form method="post" action="{{ url_for('main.act', bid=b.id, action='addon') }}" class="d-flex gap-1 flex-wrap">
+     <input type="number" name="amount" min="1" class="form-control" style="max-width:120px" placeholder="₹" autocomplete="off" required>
+     <input name="reason" class="form-control flex-grow-1" placeholder="{{ t('addon_reason') }}" required>
+     <button class="btn btn-outline-primary text-nowrap">{{ t('propose_addon') }}</button></form>
+   {% elif a in ('cancel', 'wcancel') %}
+    {% set pol = policy_text(b) %}{% if pol %}<div class="small text-muted"><i class="bi bi-info-circle"></i> {{ pol }}</div>{% endif %}
+    {% if a == 'wcancel' %}<div class="small text-muted">{{ t('worker_cancel_note') }}</div>{% endif %}
+    <form method="post" action="{{ url_for('main.act', bid=b.id, action=a) }}" class="d-flex gap-1">
+     <input name="reason" class="form-control" placeholder="{{ t('cancel_reason') }}">
+     <button class="btn btn-outline-danger text-nowrap">{{ t('cancel_btn') }}</button></form>
+   {% elif a == 'start' %}{{ post(b, 'start', t('start_job'), 'btn-outline-primary', False) }}
+   {% elif a == 'decline' %}{{ post(b, 'decline', t('decline'), 'btn-outline-danger', False) }}
+   {% elif a == 'reject_counter' %}{{ post(b, 'reject_counter', t('reject_counter'), 'btn-outline-danger', False) }}
+   {% elif a == 'reject_addon' %}{{ post(b, 'reject_addon', t('reject_addon'), 'btn-outline-danger', False) }}{% endif %}
+  {% endfor %}
+ </div></div>
  {% endif %}
 
  {% if b.status == 'cancelled' %}

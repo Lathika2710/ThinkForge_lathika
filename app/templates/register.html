@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="row justify-content-center"><div class="col-md-7"><div class="card card-body shadow-sm">
+<div class="card job card-body">
  <h3>{{ t('register') }}</h3>
  <div class="btn-group mb-3">
   <a class="btn btn-outline-primary {{ 'active' if role == 'customer' }}" href="{{ url_for('main.register', role='customer') }}">{{ t('role_customer') }}</a>
@@ -25,7 +25,7 @@
    <div class="col-12"><label class="form-label">{{ t('service_areas') }}</label><input name="service_areas" class="form-control"></div>
    {% endif %}
   </div>
-  <button class="btn btn-primary w-100 mt-3">{{ t('register') }}</button>
+  <button class="btn btn-primary btn-lg w-100 mt-3">{{ t('register') }}</button>
  </form>
-</div></div></div>
+</div>
 {% endblock %}

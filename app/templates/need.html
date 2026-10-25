@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block content %}
+{% set cname = t('cat_' + cat.name) %}
+<div class="text-center my-3"><i class="bi {{ cat.icon }} fs-1 text-primary"></i><h2>{{ t('when_help', c=cname) }}</h2></div>
+<div class="d-grid gap-3">
+ {% if g.user and g.user.role == 'customer' %}
+ <form method="post" action="{{ url_for('main.sos') }}" class="d-grid"><input type="hidden" name="category_id" value="{{ cat.id }}">
+  <button class="btn btn-danger btn-xl"><i class="bi bi-exclamation-triangle-fill"></i> {{ t('need_now') }}<small>{{ t('need_now_sub', c=cname) }}</small></button></form>
+ {% else %}
+ <a class="btn btn-danger btn-xl" href="{{ url_for('main.login', role='customer', next=url_for('main.need', cid=cat.id)) }}"><i class="bi bi-exclamation-triangle-fill"></i> {{ t('need_now') }}<small>{{ t('login_to_continue') }}</small></a>
+ {% endif %}
+ <a class="btn btn-primary btn-xl" href="{{ url_for('main.workers', category=cat.id) }}"><i class="bi bi-calendar-event"></i> {{ t('need_later') }}<small>{{ t('need_later_sub') }}</small></a>
+</div>
+<div class="text-center mt-3"><a class="small text-muted" href="{{ url_for('main.index') }}"><i class="bi bi-arrow-left"></i> {{ t('change') }}</a></div>
+<div class="small text-muted text-center mt-4"><i class="bi bi-telephone-fill"></i> {{ t('sos_emergency') }}</div>
+{% endblock %}

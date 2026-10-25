@@ -82,6 +82,14 @@ EN = dict(
     tip_reliable="Avoid cancelling confirmed jobs; your reliability score is shown to customers.",
 
 
+    # simple UI
+    choose_service="What do you need?", when_help="When do you need the {c}?", need_now="Now", need_now_sub="Send an SOS to every available {c} nearby",
+    need_later="Pick a day", need_later_sub="See workers, choose one and book a time", login_to_continue="Login to continue",
+    nav_jobs="Jobs", nav_money="Money", nav_me="Me", more="More", book="Book", pay_now="Pay ₹{a}", rate="Rate",
+    today="Today", upcoming="Upcoming", nothing_today="Nothing today.", im_available="I am available", not_available="Not available",
+    money_title="Money", earned="Earned", awaiting="Awaiting payment", jobs_done="Jobs done", no_money="No paid jobs yet.",
+    me_title="My account", logout="Logout", optional="optional", price_hint="Starts from ₹{p}. You can change it.",
+    pick_worker="Choose a {c}", waiting="Waiting", change="Change",
     language="Language", footer="Demo project — payments are simulated.",
 )
 
@@ -174,6 +182,13 @@ TA = dict(
     tip_reliable="உறுதி செய்த வேலைகளை ரத்து செய்யாதீர்கள்; உங்கள் நம்பகத்தன்மை மதிப்பெண் வாடிக்கையாளர்களுக்குக் காட்டப்படும்.",
 
 
+    choose_service="உங்களுக்கு என்ன தேவை?", when_help="{c} எப்போது தேவை?", need_now="இப்போதே", need_now_sub="அருகிலுள்ள கிடைக்கும் எல்லா {c}-க்கும் அவசர அழைப்பு அனுப்பு",
+    need_later="நாள் தேர்வு", need_later_sub="பணியாளர்களைப் பார்த்து, ஒருவரைத் தேர்ந்தெடுத்து நேரம் பதிவு செய்", login_to_continue="தொடர உள்நுழை",
+    nav_jobs="வேலைகள்", nav_money="பணம்", nav_me="நான்", more="மேலும்", book="முன்பதிவு", pay_now="₹{a} செலுத்து", rate="மதிப்பிடு",
+    today="இன்று", upcoming="வரவிருக்கும்", nothing_today="இன்று எதுவும் இல்லை.", im_available="நான் கிடைக்கிறேன்", not_available="கிடைக்கவில்லை",
+    money_title="பணம்", earned="சம்பாதித்தது", awaiting="பணம் காத்திருக்கிறது", jobs_done="முடித்த வேலைகள்", no_money="இன்னும் பணம் பெற்ற வேலைகள் இல்லை.",
+    me_title="என் கணக்கு", logout="வெளியேறு", optional="விருப்பம்", price_hint="₹{p} முதல். நீங்கள் மாற்றலாம்.",
+    pick_worker="{c} தேர்ந்தெடு", waiting="காத்திருக்கிறது", change="மாற்று",
     language="மொழி", footer="டெமோ திட்டம் — பணம் செலுத்துதல் உருவகம்.",
 )
 
@@ -259,6 +274,13 @@ HI = dict(
     tip_reliable="पक्के काम रद्द न करें; आपका भरोसे का स्कोर ग्राहकों को दिखता है।",
 
 
+    choose_service="आपको क्या चाहिए?", when_help="{c} कब चाहिए?", need_now="अभी", need_now_sub="पास के हर उपलब्ध {c} को आपातकालीन संदेश भेजें",
+    need_later="दिन चुनें", need_later_sub="कारीगर देखें, एक चुनें और समय बुक करें", login_to_continue="आगे बढ़ने के लिए लॉगिन करें",
+    nav_jobs="काम", nav_money="पैसा", nav_me="मैं", more="और", book="बुक करें", pay_now="₹{a} दें", rate="रेटिंग दें",
+    today="आज", upcoming="आगामी", nothing_today="आज कुछ नहीं।", im_available="मैं उपलब्ध हूँ", not_available="उपलब्ध नहीं",
+    money_title="पैसा", earned="कमाया", awaiting="भुगतान बाकी", jobs_done="पूरे काम", no_money="अभी कोई भुगतान वाला काम नहीं।",
+    me_title="मेरा खाता", logout="लॉगआउट", optional="वैकल्पिक", price_hint="₹{p} से शुरू। आप बदल सकते हैं।",
+    pick_worker="{c} चुनें", waiting="प्रतीक्षा में", change="बदलें",
     language="भाषा", footer="डेमो प्रोजेक्ट — भुगतान सिम्युलेटेड हैं।",
 )
 

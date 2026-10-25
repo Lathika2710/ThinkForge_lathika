@@ -1,26 +1,27 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="row justify-content-center"><div class="col-md-7"><div class="card card-body shadow-sm">
- <h4>{{ t('book_now') }} — {{ wp.user.name }} <small class="text-muted">({{ t('cat_' + wp.category.name) }})</small></h4>
+<div class="card job"><div class="card-body">
+ <div class="d-flex align-items-center gap-3 mb-3">
+  <div class="avatar"><i class="bi bi-person-fill"></i></div>
+  <div><div class="fw-bold">{{ wp.user.name }}</div><div class="small text-muted">{{ t('cat_' + wp.category.name) }}</div></div>
+ </div>
  <form method="post" enctype="multipart/form-data" autocomplete="off">
-  <label class="form-label fw-semibold">{{ t('describe_problem') }}</label>
-  <textarea id="problem" name="problem" class="form-control mb-3" rows="3" maxlength="1000" required>{{ request.form.get('problem', '') }}</textarea>
-  <label class="form-label fw-semibold">{{ t('upload_photo') }}</label>
-  <input type="file" name="photo" accept="image/png,image/jpeg" class="form-control">
-  <div class="form-text mb-3"><i class="bi bi-camera"></i> {{ t('photo_help') }}</div>
-  <div class="row g-3 mb-3">
-   <div class="col-6"><label class="form-label">{{ t('date') }}</label><input type="date" name="date" min="{{ today }}" class="form-control" required value="{{ request.form.get('date', '') }}"></div>
-   <div class="col-6"><label class="form-label">{{ t('time') }}</label><input type="time" name="time" class="form-control" required value="{{ request.form.get('time', '') }}"></div>
+  <div class="row g-2 mb-3">
+   <div class="col-6"><label class="form-label">{{ t('date') }}</label><input type="date" name="date" min="{{ today }}" class="form-control form-control-lg" required value="{{ request.form.get('date', today) }}"></div>
+   <div class="col-6"><label class="form-label">{{ t('time') }}</label><input type="time" name="time" class="form-control form-control-lg" required value="{{ request.form.get('time', '') }}"></div>
   </div>
+  <label class="form-label">{{ t('your_offer') }}</label>
+  <input type="number" name="price" min="1" max="100000" step="1" inputmode="numeric" required class="form-control form-control-lg mb-1"
+         value="{{ request.form.get('price', wp.starting_price) }}">
+  <div class="form-text mb-3">{{ t('price_hint', p=wp.starting_price) }}</div>
+  <label class="form-label">{{ t('describe_problem') }}</label>
+  <textarea name="problem" class="form-control mb-3" rows="2" maxlength="1000" required>{{ request.form.get('problem', '') }}</textarea>
+  <label class="form-label">{{ t('upload_photo') }}</label>
+  <input type="file" name="photo" accept="image/png,image/jpeg" class="form-control mb-3">
   <label class="form-label">{{ t('address') }}</label>
   <input name="address" class="form-control mb-3" value="{{ request.form.get('address') or g.user.address or '' }}">
-  <label class="form-label fw-semibold">{{ t('your_offer') }}</label>
-  <input type="number" name="price" min="1" max="100000" step="1" inputmode="numeric" autocomplete="off" required
-         class="form-control" placeholder="{{ t('from_price') }} ₹{{ wp.starting_price }}" value="{{ request.form.get('price', '') }}">
-  <div class="form-text mb-3">{{ t('offer_help') }}</div>
-  <div class="alert alert-warning small"><b><i class="bi bi-shield-exclamation"></i> {{ t('policy_title') }}:</b>
-   {{ t('policy_generic', h=cfg.FREE_CANCEL_HOURS, p=cfg.LATE_FEE_PERCENT, f=cfg.TRAVEL_FEE) }}</div>
-  <button class="btn btn-primary w-100">{{ t('send_request') }}</button>
+  <button class="btn btn-primary btn-lg w-100">{{ t('send_request') }}</button>
  </form>
-</div></div></div>
+</div></div>
+<div class="text-center mt-3"><a class="small text-muted" href="{{ url_for('main.workers', category=wp.category_id) }}"><i class="bi bi-arrow-left"></i> {{ t('change') }}</a></div>
 {% endblock %}

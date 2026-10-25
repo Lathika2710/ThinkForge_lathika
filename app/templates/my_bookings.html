@@ -1,7 +1,6 @@
 {% extends 'base.html' %}
 {% block content %}
-<h3>{{ t('my_bookings') }}</h3>
-<div class="alert alert-warning small"><b><i class="bi bi-shield-exclamation"></i> {{ t('policy_title') }}:</b> {{ t('policy_generic', h=cfg.FREE_CANCEL_HOURS, p=cfg.LATE_FEE_PERCENT, f=cfg.TRAVEL_FEE) }}</div>
+<h2 class="text-center my-3">{{ t('my_bookings') }}</h2>
 {% set view = 'customer' %}
-{% for b in rows %}{% include '_booking.html' %}{% else %}<p class="text-muted">{{ t('no_bookings') }}</p>{% endfor %}
+{% for b in rows %}{% include '_booking.html' %}{% else %}<p class="text-muted text-center">{{ t('no_bookings') }}</p>{% endfor %}
 {% endblock %}
