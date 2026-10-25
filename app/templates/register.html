@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row justify-content-center"><div class="col-md-7"><div class="card card-body shadow-sm">
+ <h3>{{ t('register') }}</h3>
+ <div class="btn-group mb-3">
+  <a class="btn btn-outline-primary {{ 'active' if role == 'customer' }}" href="{{ url_for('main.register', role='customer') }}">{{ t('role_customer') }}</a>
+  <a class="btn btn-outline-primary {{ 'active' if role == 'worker' }}" href="{{ url_for('main.register', role='worker') }}">{{ t('role_worker') }}</a>
+ </div>
+ <form method="post" autocomplete="off">
+  <input type="hidden" name="role" value="{{ role }}">
+  <div class="row g-3">
+   <div class="col-md-6"><label class="form-label">{{ t('name') }}</label><input name="name" class="form-control" required></div>
+   <div class="col-md-6"><label class="form-label">{{ t('phone') }}</label><input name="phone" class="form-control" inputmode="numeric" minlength="10" maxlength="15" required></div>
+   <div class="col-md-6"><label class="form-label">{{ t('email') }}</label><input type="email" name="email" class="form-control" required></div>
+   <div class="col-md-6"><label class="form-label">{{ t('password') }}</label><input type="password" name="password" minlength="6" class="form-control" required></div>
+   <div class="col-md-6"><label class="form-label">{{ t('city') }}</label><input name="city" class="form-control"></div>
+   {% if role == 'customer' %}
+   <div class="col-md-6"><label class="form-label">{{ t('area') }}</label><input name="area" class="form-control"></div>
+   <div class="col-12"><label class="form-label">{{ t('address') }}</label><input name="address" class="form-control"></div>
+   {% else %}
+   <div class="col-md-6"><label class="form-label">{{ t('category') }}</label><select name="category_id" class="form-select">{% for c in cats %}<option value="{{ c.id }}">{{ t('cat_' + c.name) }}</option>{% endfor %}</select></div>
+   <div class="col-md-6"><label class="form-label">{{ t('experience') }}</label><input type="number" name="experience" min="0" max="60" class="form-control" required></div>
+   <div class="col-md-6"><label class="form-label">{{ t('starting_price') }}</label><input type="number" name="starting_price" min="1" class="form-control" required></div>
+   <div class="col-12"><label class="form-label">{{ t('skills') }}</label><input name="skills" class="form-control"></div>
+   <div class="col-12"><label class="form-label">{{ t('service_areas') }}</label><input name="service_areas" class="form-control"></div>
+   {% endif %}
+  </div>
+  <button class="btn btn-primary w-100 mt-3">{{ t('register') }}</button>
+ </form>
+</div></div></div>
+{% endblock %}

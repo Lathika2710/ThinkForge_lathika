@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row justify-content-center"><div class="col-md-7"><div class="card card-body shadow-sm">
+ <h4>{{ t('book_now') }} — {{ wp.user.name }} <small class="text-muted">({{ t('cat_' + wp.category.name) }})</small></h4>
+ <form method="post" enctype="multipart/form-data" autocomplete="off">
+  <label class="form-label fw-semibold">{{ t('describe_problem') }}</label>
+  <div class="input-group mb-1">
+   <textarea id="problem" name="problem" class="form-control" rows="3" maxlength="1000" required>{{ request.form.get('problem', '') }}</textarea>
+   <button type="button" class="btn btn-outline-primary mic-btn" data-target="#problem"><i class="bi bi-mic-fill"></i></button>
+  </div>
+  <div class="form-text mb-3">{{ t('mic_tip') }}</div>
+  <label class="form-label fw-semibold">{{ t('upload_photo') }}</label>
+  <input type="file" name="photo" accept="image/png,image/jpeg" class="form-control">
+  <div class="form-text mb-3"><i class="bi bi-camera"></i> {{ t('photo_help') }}</div>
+  <div class="row g-3 mb-3">
+   <div class="col-6"><label class="form-label">{{ t('date') }}</label><input type="date" name="date" min="{{ today }}" class="form-control" required value="{{ request.form.get('date', '') }}"></div>
+   <div class="col-6"><label class="form-label">{{ t('time') }}</label><input type="time" name="time" class="form-control" required value="{{ request.form.get('time', '') }}"></div>
+  </div>
+  <label class="form-label">{{ t('address') }}</label>
+  <input name="address" class="form-control mb-3" value="{{ request.form.get('address') or g.user.address or '' }}">
+  <label class="form-label fw-semibold">{{ t('your_offer') }}</label>
+  <input type="number" name="price" min="1" max="100000" step="1" inputmode="numeric" autocomplete="off" required
+         class="form-control" placeholder="{{ t('from_price') }} ₹{{ wp.starting_price }}" value="{{ request.form.get('price', '') }}">
+  <div class="form-text mb-3">{{ t('offer_help') }}</div>
+  <div class="alert alert-warning small"><b><i class="bi bi-shield-exclamation"></i> {{ t('policy_title') }}:</b>
+   {{ t('policy_generic', h=cfg.FREE_CANCEL_HOURS, p=cfg.LATE_FEE_PERCENT, f=cfg.TRAVEL_FEE) }}</div>
+  <button class="btn btn-primary w-100">{{ t('send_request') }}</button>
+ </form>
+</div></div></div>
+{% endblock %}

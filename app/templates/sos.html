@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row justify-content-center"><div class="col-md-6"><div class="card card-body border-danger shadow">
+ <h3 class="text-danger"><i class="bi bi-exclamation-triangle-fill"></i> {{ t('sos_button') }}</h3>
+ <p class="text-muted">{{ t('sos_sub') }}</p>
+ <form method="post">
+  <label class="fw-semibold mb-2">{{ t('sos_q') }}</label>
+  <div class="row g-2 mb-3">
+   {% for c in cats %}<div class="col-6">
+    <input type="radio" class="btn-check" name="category_id" id="c{{ c.id }}" value="{{ c.id }}" required>
+    <label class="btn btn-outline-danger w-100 py-3 sos-option" for="c{{ c.id }}"><i class="bi {{ c.icon }} fs-4 d-block"></i>{{ t('cat_' + c.name) }}</label></div>{% endfor %}
+  </div>
+  <button class="btn btn-danger btn-lg w-100">{{ t('sos_send') }}</button>
+ </form>
+ <div class="alert alert-secondary small mt-3 mb-0"><i class="bi bi-telephone-fill"></i> {{ t('sos_emergency') }}</div>
+</div></div></div>
+{% endblock %}

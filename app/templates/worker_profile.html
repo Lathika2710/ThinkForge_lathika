@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="card card-body shadow-sm mb-4">
+ <h3>{{ wp.user.name }} <i class="bi bi-patch-check-fill text-primary"></i></h3>
+ <div class="text-muted">{{ t('cat_' + wp.category.name) }} · {{ wp.experience_years }} {{ t('yrs') }} · {{ t('from_price') }} ₹{{ wp.starting_price }}</div>
+ <p class="mb-1">{{ wp.skills }}</p>
+ <div>{% if wp.review_count %}<span class="stars">{{ '★' * wp.avg_rating|round|int }}</span> {{ wp.avg_rating }} ({{ wp.review_count }}){% else %}{{ t('no_reviews') }}{% endif %} · {{ t('reliability') }}: <b>{{ wp.reliability }}%</b></div>
+ {% if wp.available and (not g.user or g.user.role == 'customer') %}<div class="mt-3"><a class="btn btn-primary" href="{{ url_for('main.book', wid=wp.id) }}">{{ t('book_now') }}</a></div>{% endif %}
+</div>
+<h5>{{ t('reviews') }}</h5>
+{% for r in reviews %}<div class="card card-body mb-2"><div><span class="stars">{{ '★' * r.rating }}{{ '☆' * (5 - r.rating) }}</span> <span class="small text-muted">{{ r.customer.name }} · {{ r.created_at|dt }}</span></div><div>{{ r.comment }}</div></div>
+{% else %}<p class="text-muted">{{ t('no_reviews') }}</p>{% endfor %}
+{% endblock %}

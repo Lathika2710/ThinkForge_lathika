@@ -1,0 +1,81 @@
+{% macro post(b, action, label, cls='btn-primary') -%}
+<form method="post" action="{{ url_for('main.act', bid=b.id, action=action) }}" class="d-inline"><button class="btn btn-sm {{ cls }}">{{ label }}</button></form>
+{%- endmacro %}
+{% set colors = {'pending':'warning text-dark','countered':'info text-dark','confirmed':'primary','travelling':'primary','in_progress':'primary','completed':'success','paid':'success','cancelled':'secondary','declined':'secondary','sos_open':'danger'} %}
+{% set shared = b.status in ('confirmed','travelling','in_progress','completed','paid') %}
+<div class="card mb-3 shadow-sm {{ 'border-danger' if b.is_sos }}"><div class="card-body">
+ <div class="d-flex justify-content-between align-items-start">
+  <h5 class="mb-1">{{ t('cat_' + b.category.name) }} {% if b.is_sos %}<span class="badge bg-danger">SOS</span>{% endif %}</h5>
+  <span class="badge bg-{{ colors[b.status] }}">{{ t('st_' + b.status) }}</span>
+ </div>
+ <div class="small text-muted mb-2">
+  {% if view == 'customer' %}{% if b.worker %}<i class="bi bi-person-badge"></i> {{ b.worker.user.name }}{% if shared %} · {{ b.worker.user.phone }}{% endif %}{% endif %}
+  {% else %}<i class="bi bi-person"></i> {{ b.customer.name }}{% if shared %} · {{ b.customer.phone }}{% endif %}{% endif %}
+  · <i class="bi bi-calendar-event"></i> {{ b.start|dt }}
+  {% if view == 'worker' and shared and b.address %}<br><i class="bi bi-geo-alt"></i> {{ b.address }}{% endif %}
+ </div>
+ {% if not b.is_sos %}<p class="mb-1">{{ b.problem }}</p>{% endif %}
+ {% if b.photo %}<a href="{{ url_for('main.photo', name=b.photo) }}" target="_blank"><img class="thumb" src="{{ url_for('main.photo', name=b.photo) }}" alt=""></a>{% endif %}
+ <div class="mb-2">
+  {% if b.offered_price %}<span class="me-3">{{ t('offered') }}: ₹{{ b.offered_price }}</span>{% endif %}
+  {% if b.counter_price %}<span class="me-3">{{ t('counter') }}: ₹{{ b.counter_price }}</span>{% endif %}
+  {% if b.agreed_price %}<span class="me-3 fw-semibold">{{ t('agreed') }}: ₹{{ b.agreed_price }}</span>{% endif %}
+  {% if b.addon_status == 'accepted' %}<span class="me-3">+ ₹{{ b.addon_amount }} ({{ b.addon_reason }})</span><b>{{ t('total') }}: ₹{{ b.total }}</b>{% endif %}
+ </div>
+ {% if b.addon_status == 'proposed' %}<div class="alert alert-info py-2 small">{{ t('addon_proposed', a=b.addon_amount, r=b.addon_reason) }}</div>{% endif %}
+ {% set pol = policy_text(b) %}
+ {% if pol %}<div class="alert alert-warning py-2 small mb-2"><i class="bi bi-shield-exclamation"></i> <b>{{ t('policy_title') }}:</b> {{ pol }}</div>{% endif %}
+
+ {# ---------- worker actions ---------- #}
+ {% if view == 'worker' %}
+  {% if b.status == 'pending' %}
+   <div class="d-flex flex-wrap gap-2 align-items-center">
+    {{ post(b, 'accept', t('accept'), 'btn-success') }}{{ post(b, 'decline', t('decline'), 'btn-outline-danger') }}
+    <form method="post" action="{{ url_for('main.act', bid=b.id, action='counter') }}" class="d-flex gap-1">
+     <input type="number" name="price" min="1" class="form-control form-control-sm" style="width:130px" placeholder="{{ t('counter_price') }}" autocomplete="off" required>
+     <button class="btn btn-sm btn-outline-primary">{{ t('counter_offer') }}</button></form>
+   </div>
+  {% elif b.status == 'countered' %}<span class="text-muted small">{{ t('waiting_customer') }}</span>
+  {% elif b.status in ('confirmed', 'travelling') %}
+   <div class="d-flex flex-wrap gap-2">
+    {% if b.status == 'confirmed' %}{{ post(b, 'travel', t('on_the_way'), 'btn-outline-primary') }}{% endif %}
+    {{ post(b, 'start', t('start_job'), 'btn-primary') }}
+    <form method="post" action="{{ url_for('main.act', bid=b.id, action='wcancel') }}" class="d-flex gap-1">
+     <input name="reason" class="form-control form-control-sm" placeholder="{{ t('cancel_reason') }}">
+     <button class="btn btn-sm btn-outline-danger">{{ t('cancel_btn') }}</button></form>
+   </div><div class="small text-muted mt-1">{{ t('worker_cancel_note') }}</div>
+  {% elif b.status == 'in_progress' %}
+   <div class="d-flex flex-wrap gap-2">
+    {% if b.addon_status != 'proposed' and b.addon_status != 'accepted' %}
+    <form method="post" action="{{ url_for('main.act', bid=b.id, action='addon') }}" class="d-flex gap-1 flex-wrap">
+     <input type="number" name="amount" min="1" class="form-control form-control-sm" style="width:130px" placeholder="{{ t('addon_amount') }}" autocomplete="off" required>
+     <input name="reason" class="form-control form-control-sm" style="width:210px" placeholder="{{ t('addon_reason') }}" required>
+     <button class="btn btn-sm btn-outline-primary">{{ t('propose_addon') }}</button></form>{% endif %}
+    {{ post(b, 'done', t('mark_done'), 'btn-success') }}
+   </div>
+  {% elif b.status == 'completed' %}<span class="text-muted small">{{ t('waiting_customer') }}</span>{% endif %}
+
+ {# ---------- customer actions ---------- #}
+ {% else %}
+  {% if b.status == 'countered' %}
+   <div class="d-flex gap-2">{{ post(b, 'accept_counter', t('accept_counter') + ' ₹' ~ b.counter_price, 'btn-success') }}{{ post(b, 'reject_counter', t('reject_counter'), 'btn-outline-danger') }}</div>
+  {% elif b.status == 'pending' %}<span class="text-muted small">{{ t('waiting_worker') }}</span>{% endif %}
+  {% if b.addon_status == 'proposed' %}<div class="d-flex gap-2 mt-2">{{ post(b, 'accept_addon', t('accept_addon'), 'btn-success') }}{{ post(b, 'reject_addon', t('reject_addon'), 'btn-outline-danger') }}</div>{% endif %}
+  {% if b.status == 'completed' %}
+   <div class="d-flex gap-2 align-items-center">{{ post(b, 'pay', t('confirm_pay'), 'btn-success') }}<span class="small text-muted">{{ t('pay_note') }}</span></div>
+  {% endif %}
+  {% if b.status in ('completed', 'paid') and not b.review %}<a class="btn btn-sm btn-warning mt-2" href="{{ url_for('main.review', bid=b.id) }}"><i class="bi bi-star-fill"></i> {{ t('leave_review') }}</a>{% endif %}
+  {% if b.status in ('pending', 'countered', 'confirmed', 'travelling') %}
+   <form method="post" action="{{ url_for('main.act', bid=b.id, action='cancel') }}" class="d-flex gap-1 mt-2">
+    <input name="reason" class="form-control form-control-sm" placeholder="{{ t('cancel_reason') }}">
+    <button class="btn btn-sm btn-outline-danger text-nowrap">{{ t('cancel_btn') }}</button></form>
+  {% endif %}
+  {% if b.status == 'sos_open' %}<a class="btn btn-sm btn-outline-danger" href="{{ url_for('main.sos_status', bid=b.id) }}">SOS</a>{% endif %}
+ {% endif %}
+
+ {% if b.status == 'cancelled' %}
+  <div class="small text-muted">{{ t('cancelled_by_worker') if b.cancelled_by == 'worker' else t('cancelled_by_customer') }}{% if b.cancel_reason %}: {{ b.cancel_reason }}{% endif %}
+  {% if b.cancel_fee %}<br><b>{{ t('fee_charged', f=b.cancel_fee) }}</b>{% endif %}</div>
+ {% endif %}
+ {% if b.review %}<div class="mt-2 small"><span class="stars">{{ '★' * b.review.rating }}{{ '☆' * (5 - b.review.rating) }}</span> {{ b.review.comment }}</div>{% endif %}
+</div></div>

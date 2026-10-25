@@ -1,0 +1,10 @@
+body{background:#f6f8fb}
+.hero{padding:2rem 1rem;background:linear-gradient(135deg,#e8f1ff,#fff);border-radius:1rem}
+.sos-btn{box-shadow:0 0 0 .4rem rgba(220,53,69,.15);font-weight:700}
+.cat-card{text-decoration:none;color:inherit;transition:transform .1s}
+.cat-card:hover{transform:translateY(-3px)}
+.cat-card i{font-size:1.8rem;color:#0d6efd}
+.thumb{max-height:90px;border-radius:.5rem;margin:.25rem 0}
+.stars{color:#f5a623;letter-spacing:1px}
+.sos-option{cursor:pointer}
+.btn-check:checked+.sos-option{background:#dc3545;color:#fff;border-color:#dc3545}

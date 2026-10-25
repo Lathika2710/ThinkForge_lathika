@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block content %}
+<h3>{{ t('admin_title') }}</h3>
+<div class="row g-3 mb-4">
+ {% for k in ['users', 'workers', 'bookings', 'completed'] %}<div class="col-6 col-md-3"><div class="card card-body text-center shadow-sm"><div class="fs-2 fw-bold text-primary">{{ stats[k] }}</div>{{ t('stat_' + k) }}</div></div>{% endfor %}
+</div>
+<h5>{{ t('all_workers') }}</h5>
+<div class="table-responsive"><table class="table bg-white align-middle">
+ {% for wp in wps %}<tr><td>{{ wp.user.name }}<br><small class="text-muted">{{ wp.user.email }}</small></td><td>{{ t('cat_' + wp.category.name) }}</td><td>{{ wp.city }}</td>
+  <td>{% if wp.verified %}<span class="badge bg-success">{{ t('verified') }}</span>{% else %}<span class="badge bg-warning text-dark">{{ t('st_pending') }}</span>{% endif %}</td>
+  <td><form method="post" action="{{ url_for('main.admin_verify', wid=wp.id) }}"><button class="btn btn-sm {{ 'btn-outline-secondary' if wp.verified else 'btn-success' }}">{{ t('unverify') if wp.verified else t('verify') }}</button></form></td></tr>{% endfor %}
+</table></div>
+{% endblock %}

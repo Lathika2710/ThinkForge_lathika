@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row justify-content-center"><div class="col-md-5"><div class="card card-body shadow-sm">
+ <h3>{{ t('login') }}</h3>
+ <form method="post">
+  <div class="mb-3"><label class="form-label">{{ t('email') }}</label><input type="email" name="email" class="form-control" required></div>
+  <div class="mb-3"><label class="form-label">{{ t('password') }}</label><input type="password" name="password" class="form-control" required></div>
+  <button class="btn btn-primary w-100">{{ t('login') }}</button>
+ </form>
+</div></div></div>
+{% endblock %}

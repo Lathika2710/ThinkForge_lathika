@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block body_attrs %}{% if b.status == 'sos_open' %}data-refresh="5000"{% endif %}{% endblock %}
+{% block content %}
+{% set tip = 'tip_' + b.category.name %}
+<div class="row justify-content-center"><div class="col-md-6"><div class="card card-body shadow text-center {{ 'border-danger' if b.status == 'sos_open' else 'border-success' }}">
+ <h4>{{ t('cat_' + b.category.name) }}</h4>
+ {% if b.status == 'sos_open' %}
+  <div class="spinner-border text-danger mx-auto my-3"></div><p>{{ t('sos_waiting') }}</p>
+  <form method="post" action="{{ url_for('main.act', bid=b.id, action='cancel') }}"><button class="btn btn-sm btn-outline-secondary">{{ t('cancel_btn') }}</button></form>
+ {% elif b.worker %}
+  <i class="bi bi-check-circle-fill text-success fs-1"></i>
+  <p class="fs-5 mb-1">{{ t('sos_accepted') }}</p>
+  <p><b>{{ b.worker.user.name }}</b> · {{ b.worker.user.phone }}<br>{{ t('agreed') }}: ₹{{ b.agreed_price }}</p>
+  <a class="btn btn-primary" href="{{ url_for('main.my_bookings') }}">{{ t('nav_bookings') }}</a>
+ {% else %}<p>{{ t('st_cancelled') }}</p>{% endif %}
+ <div class="alert alert-warning text-start small mt-3 mb-2"><b><i class="bi bi-shield-check"></i> {{ t('sos_safety') }}:</b> {{ t(tip) if tip in ('tip_Electrician', 'tip_Plumber') else t('tip_other') }}</div>
+ <div class="alert alert-secondary text-start small mb-0"><i class="bi bi-telephone-fill"></i> {{ t('sos_emergency') }}</div>
+</div></div></div>
+{% endblock %}
