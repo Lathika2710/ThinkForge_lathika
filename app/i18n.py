@@ -89,7 +89,7 @@ EN = dict(
     today="Today", upcoming="Upcoming", nothing_today="Nothing today.", im_available="I am available", not_available="Not available",
     money_title="Money", earned="Earned", awaiting="Awaiting payment", jobs_done="Jobs done", no_money="No paid jobs yet.",
     me_title="My account", logout="Logout", optional="optional", price_hint="Starts from ₹{p}. You can change it.",
-    pick_worker="Choose a {c}", waiting="Waiting", change="Change",
+    pick_worker="Choose your {c}", waiting="Waiting", change="Change",
     # top nav / notifications / dashboards
     nav_notifications="Notifications", nav_profile="Profile", nav_earnings="Earnings", already_account="Already have an account?",
     login_here="Login", needs_action="Needs your action", no_notifications="Nothing new. You are all caught up.",
