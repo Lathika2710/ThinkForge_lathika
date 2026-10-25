@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: localhands
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: python seed.py --sample && gunicorn run:app --bind 0.0.0.0:$PORT --workers 1 --threads 4
+    healthCheckPath: /
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.4"
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ADMIN_EMAIL
+        value: admin@example.com
+      - key: ADMIN_PASSWORD
+        value: ChangeMe123
+      - key: DB_ENGINE
+        value: sqlite
