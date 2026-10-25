@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% block content %}
+<div class="narrow" style="max-width:600px">
 <div class="card job"><div class="card-body">
  <div class="d-flex align-items-center gap-3 mb-3">
   <div class="avatar"><i class="bi bi-person-fill"></i></div>
@@ -24,4 +25,5 @@
  </form>
 </div></div>
 <div class="text-center mt-3"><a class="small text-muted" href="{{ url_for('main.workers', category=wp.category_id) }}"><i class="bi bi-arrow-left"></i> {{ t('change') }}</a></div>
+</div>
 {% endblock %}

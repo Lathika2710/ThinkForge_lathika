@@ -54,12 +54,11 @@ def index():
     if g.user and g.user.role in ("worker", "admin"):
         return redirect(home_for(g.user))
     if not g.user:
-        role = session.get("role")
-        if role == "worker":
-            return redirect(url_for("main.login", role="worker"))
-        if role != "customer":
-            return render_template("choose_role.html")
-    return render_template("index.html", cats=Category.query.all())
+        return render_template("choose_role.html")
+    active = (Booking.query.filter(Booking.customer_id == g.user.id,
+                                   Booking.status.in_(("pending", "countered", "confirmed", "travelling", "in_progress", "completed", "sos_open")))
+              .order_by(Booking.start).all())
+    return render_template("index.html", cats=Category.query.all(), active=active)
 
 
 @bp.route("/need/<int:cid>")
@@ -80,9 +79,7 @@ def choose_role(role):
     session["role"] = role
     if g.user:
         return redirect(home_for(g.user))
-    if role == "worker":
-        return redirect(url_for("main.login", role="worker"))
-    return redirect(url_for("main.index"))
+    return redirect(url_for("main.register", role=role))
 
 
 @bp.route("/lang/<code>")
@@ -96,7 +93,7 @@ def set_lang(code):
 @bp.route("/register", methods=["GET", "POST"])
 def register():
     cats = Category.query.all()
-    role = request.values.get("role", "customer")
+    role = request.values.get("role") or session.get("role") or "customer"
     role = role if role in ("customer", "worker") else "customer"
     if request.method == "POST":
         f = request.form
@@ -330,7 +327,9 @@ def worker_dash():
         upcoming=[b for b in active if b.start.date() > today],
         waiting=[b for b in rows if b.status in ("countered", "completed")],
     )
-    return render_template("worker_dash.html", wp=wp, sos_open=sos_open, groups=groups)
+    summary = dict(today=len(groups["today"]), requests=len(groups["requests"]),
+                   earned=sum(b.total for b in rows if b.status == "paid"))
+    return render_template("worker_dash.html", wp=wp, sos_open=sos_open, groups=groups, summary=summary)
 
 
 @bp.route("/worker/availability", methods=["POST"])
@@ -349,6 +348,74 @@ def worker_money():
     stats = dict(earned=sum(b.total for b in rows if b.status == "paid"),
                  awaiting=sum(b.total for b in rows if b.status == "completed"), done=len(rows))
     return render_template("money.html", wp=wp, rows=rows, stats=stats)
+
+
+def notifications_for(u):
+    """Recent events for this user, newest first. Items with action=True need a response."""
+    items = []
+
+    def add(b, key, when, action=False, **kw):
+        kw.setdefault("a", b.total or b.agreed_price or b.counter_price or b.offered_price or 0)
+        items.append(dict(key=key, kw=kw, when=when, action=action, b=b,
+                          url=url_for("main.my_bookings") if u.role == "customer" else url_for("main.worker_dash")))
+
+    if u.role == "worker":
+        wp = u.profile
+        if wp.verified and wp.available:
+            for b in Booking.query.filter_by(status="sos_open", category_id=wp.category_id):
+                add(b, "n_sos", b.created_at, True, c=T(session.get("lang", "en"), "cat_" + b.category.name))
+        for b in Booking.query.filter_by(worker_id=wp.id).order_by(Booking.created_at.desc()).limit(40):
+            n = b.customer.name
+            if b.status == "pending":
+                add(b, "n_new_request", b.created_at, True, n=n)
+            elif b.status == "countered":
+                add(b, "n_waiting", b.created_at, n=n)
+            elif b.status in ("confirmed", "travelling", "in_progress") and not b.is_sos:
+                add(b, "n_confirmed", b.created_at, n=n)
+            elif b.status == "completed":
+                add(b, "n_pending_pay", b.start, n=n)
+            elif b.status == "paid":
+                add(b, "n_paid", b.start, n=n)
+                if b.review:
+                    add(b, "n_review", b.review.created_at, n=n, r=b.review.rating)
+            elif b.status == "cancelled" and b.cancelled_by == "customer":
+                add(b, "n_cancelled", b.start, n=n)
+    else:
+        for b in Booking.query.filter_by(customer_id=u.id).order_by(Booking.created_at.desc()).limit(40):
+            n = b.worker.user.name if b.worker else ""
+            if b.addon_status == "proposed":
+                add(b, "n_addon", b.start, True, n=n, a=b.addon_amount)
+            if b.status == "countered":
+                add(b, "n_countered", b.created_at, True, n=n, a=b.counter_price)
+            elif b.status == "completed":
+                add(b, "n_completed", b.start, True, n=n)
+            elif b.status == "confirmed":
+                add(b, "n_sos_accepted" if b.is_sos else "n_confirmed", b.created_at, n=n)
+            elif b.status == "travelling":
+                add(b, "n_travelling", b.start, n=n)
+            elif b.status == "in_progress":
+                add(b, "n_in_progress", b.start, n=n)
+            elif b.status == "declined":
+                add(b, "n_declined", b.created_at, n=n)
+            elif b.status == "cancelled" and b.cancelled_by == "worker":
+                add(b, "n_cancelled", b.start, n=n)
+    items.sort(key=lambda i: (not i["action"], -i["when"].timestamp()))
+    return items
+
+
+@bp.app_context_processor
+def inject_notification_count():
+    if not g.get("user") or g.user.role == "admin":
+        return dict(notif_count=0)
+    return dict(notif_count=sum(1 for i in notifications_for(g.user) if i["action"]))
+
+
+@bp.route("/notifications")
+@login_required()
+def notifications():
+    if g.user.role == "admin":
+        return redirect(url_for("main.admin"))
+    return render_template("notifications.html", items=notifications_for(g.user))
 
 
 @bp.route("/me", methods=["GET", "POST"])

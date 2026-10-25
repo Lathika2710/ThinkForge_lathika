@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="narrow" style="max-width:720px">
+{% set ICON = {'n_new_request':'inbox','n_sos':'exclamation-triangle-fill','n_confirmed':'calendar-check','n_countered':'arrow-left-right',
+               'n_travelling':'truck','n_in_progress':'tools','n_completed':'cash-coin','n_addon':'plus-circle','n_paid':'check-circle-fill',
+               'n_review':'star-fill','n_cancelled':'x-circle','n_declined':'x-circle','n_sos_accepted':'check-circle-fill',
+               'n_waiting':'hourglass','n_pending_pay':'hourglass'} %}
+<h3 class="mb-3"><i class="bi bi-bell"></i> {{ t('nav_notifications') }}</h3>
+{% set ns = namespace(section=None) %}
+{% for i in items %}
+ {% if i.action and ns.section != 'a' %}{% set ns.section = 'a' %}<h6 class="text-danger mt-2">{{ t('needs_action') }}</h6>
+ {% elif not i.action and ns.section != 'b' %}{% set ns.section = 'b' %}{% if loop.index > 1 %}<hr>{% endif %}{% endif %}
+ <a class="card notif mb-2 text-reset text-decoration-none {{ 'notif-action' if i.action }}" href="{{ i.url }}#more{{ i.b.id }}">
+  <div class="card-body d-flex align-items-center gap-3 py-2">
+   <div class="status-icon {{ 'text-danger' if i.action else 'text-primary' }}"><i class="bi bi-{{ ICON[i.key] }}"></i></div>
+   <div class="flex-grow-1"><div>{{ t(i.key, **i.kw) }}</div><div class="small text-muted">{{ t('cat_' + i.b.category.name) }} · {{ i.when|dt }}</div></div>
+   <i class="bi bi-chevron-right text-muted"></i>
+  </div>
+ </a>
+{% else %}
+ <div class="text-center text-muted py-5"><i class="bi bi-bell-slash fs-1 d-block mb-2"></i>{{ t('no_notifications') }}</div>
+{% endfor %}
+</div>
+{% endblock %}

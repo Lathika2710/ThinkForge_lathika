@@ -1,8 +1,18 @@
 {% extends 'base.html' %}
 {% block content %}
-<h2 class="text-center my-3">{{ t('choose_service') }}</h2>
-<div class="row g-3">
- {% for c in cats %}<div class="col-6 col-sm-4"><a class="card cat-card text-center p-3 h-100" href="{{ url_for('main.need', cid=c.id) }}">
+{% set view = 'customer' %}
+<div class="d-flex justify-content-between align-items-end mb-3">
+ <div><h3 class="mb-0">{{ t('hi', n=g.user.name) }}</h3><div class="text-muted">{{ t('book_a_service') }}</div></div>
+ {% if notif_count %}<a class="btn btn-sm btn-outline-danger" href="{{ url_for('main.notifications') }}"><i class="bi bi-bell"></i> {{ notif_count }} {{ t('needs_action') }}</a>{% endif %}
+</div>
+<div class="row g-3 mb-4">
+ {% for c in cats %}<div class="col-6 col-sm-4 col-lg-3"><a class="card cat-card text-center p-3 h-100" href="{{ url_for('main.need', cid=c.id) }}">
   <i class="bi {{ c.icon }}"></i><div class="mt-2 fw-semibold">{{ t('cat_' + c.name) }}</div></a></div>{% endfor %}
 </div>
+{% if active %}
+<div class="d-flex justify-content-between align-items-center mb-2">
+ <h5 class="mb-0">{{ t('active_bookings') }}</h5><a class="small" href="{{ url_for('main.my_bookings') }}">{{ t('see_all') }} <i class="bi bi-arrow-right"></i></a>
+</div>
+<div class="row g-3">{% for b in active[:4] %}<div class="col-md-6">{% include '_booking.html' %}</div>{% endfor %}</div>
+{% endif %}
 {% endblock %}

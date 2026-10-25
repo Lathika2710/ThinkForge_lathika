@@ -90,6 +90,16 @@ EN = dict(
     money_title="Money", earned="Earned", awaiting="Awaiting payment", jobs_done="Jobs done", no_money="No paid jobs yet.",
     me_title="My account", logout="Logout", optional="optional", price_hint="Starts from ₹{p}. You can change it.",
     pick_worker="Choose a {c}", waiting="Waiting", change="Change",
+    # top nav / notifications / dashboards
+    nav_notifications="Notifications", nav_profile="Profile", nav_earnings="Earnings", already_account="Already have an account?",
+    login_here="Login", needs_action="Needs your action", no_notifications="Nothing new. You are all caught up.",
+    active_bookings="Your active bookings", see_all="See all", view="View", hi="Hi, {n}", new_requests_short="New requests",
+    earned_total="Earned so far", book_a_service="Book a service",
+    n_new_request="New booking request from {n}", n_sos="Urgent SOS nearby: {c}", n_confirmed="Booking confirmed with {n}",
+    n_countered="{n} sent a counter-offer of ₹{a}", n_travelling="{n} is on the way", n_in_progress="{n} has started the job",
+    n_completed="Job done. Please pay ₹{a} to {n}", n_addon="{n} proposed an extra charge of ₹{a}", n_paid="₹{a} received from {n}",
+    n_review="{n} rated you {r}★", n_cancelled="Booking cancelled by {n}", n_declined="{n} declined your request",
+    n_sos_accepted="{n} accepted your SOS", n_waiting="Waiting for {n} to respond", n_pending_pay="Waiting for payment from {n}",
     language="Language", footer="Demo project — payments are simulated.",
 )
 
@@ -189,6 +199,15 @@ TA = dict(
     money_title="பணம்", earned="சம்பாதித்தது", awaiting="பணம் காத்திருக்கிறது", jobs_done="முடித்த வேலைகள்", no_money="இன்னும் பணம் பெற்ற வேலைகள் இல்லை.",
     me_title="என் கணக்கு", logout="வெளியேறு", optional="விருப்பம்", price_hint="₹{p} முதல். நீங்கள் மாற்றலாம்.",
     pick_worker="{c} தேர்ந்தெடு", waiting="காத்திருக்கிறது", change="மாற்று",
+    nav_notifications="அறிவிப்புகள்", nav_profile="சுயவிவரம்", nav_earnings="வருமானம்", already_account="ஏற்கனவே கணக்கு உள்ளதா?",
+    login_here="உள்நுழை", needs_action="உங்கள் நடவடிக்கை தேவை", no_notifications="புதியது எதுவும் இல்லை.",
+    active_bookings="உங்கள் நடப்பு முன்பதிவுகள்", see_all="எல்லாம் பார்", view="பார்", hi="வணக்கம், {n}", new_requests_short="புதிய கோரிக்கைகள்",
+    earned_total="இதுவரை சம்பாதித்தது", book_a_service="சேவையை முன்பதிவு செய்",
+    n_new_request="{n}-இடமிருந்து புதிய முன்பதிவு கோரிக்கை", n_sos="அருகில் அவசர அழைப்பு: {c}", n_confirmed="{n}-உடன் முன்பதிவு உறுதி",
+    n_countered="{n} ₹{a} எதிர் விலை அனுப்பினார்", n_travelling="{n} வந்துகொண்டிருக்கிறார்", n_in_progress="{n} வேலையைத் தொடங்கினார்",
+    n_completed="வேலை முடிந்தது. {n}-க்கு ₹{a} செலுத்துங்கள்", n_addon="{n} ₹{a} கூடுதல் கட்டணம் முன்மொழிந்தார்", n_paid="{n}-இடமிருந்து ₹{a} பெறப்பட்டது",
+    n_review="{n} உங்களுக்கு {r}★ மதிப்பீடு அளித்தார்", n_cancelled="{n} முன்பதிவை ரத்து செய்தார்", n_declined="{n} உங்கள் கோரிக்கையை மறுத்தார்",
+    n_sos_accepted="{n} உங்கள் அவசர அழைப்பை ஏற்றார்", n_waiting="{n} பதிலுக்காகக் காத்திருக்கிறது", n_pending_pay="{n}-இடமிருந்து பணம் காத்திருக்கிறது",
     language="மொழி", footer="டெமோ திட்டம் — பணம் செலுத்துதல் உருவகம்.",
 )
 
@@ -281,6 +300,15 @@ HI = dict(
     money_title="पैसा", earned="कमाया", awaiting="भुगतान बाकी", jobs_done="पूरे काम", no_money="अभी कोई भुगतान वाला काम नहीं।",
     me_title="मेरा खाता", logout="लॉगआउट", optional="वैकल्पिक", price_hint="₹{p} से शुरू। आप बदल सकते हैं।",
     pick_worker="{c} चुनें", waiting="प्रतीक्षा में", change="बदलें",
+    nav_notifications="सूचनाएँ", nav_profile="प्रोफ़ाइल", nav_earnings="कमाई", already_account="पहले से खाता है?",
+    login_here="लॉगिन", needs_action="आपकी कार्रवाई चाहिए", no_notifications="कुछ नया नहीं।",
+    active_bookings="आपकी चालू बुकिंग", see_all="सभी देखें", view="देखें", hi="नमस्ते, {n}", new_requests_short="नए अनुरोध",
+    earned_total="अब तक की कमाई", book_a_service="सेवा बुक करें",
+    n_new_request="{n} से नया बुकिंग अनुरोध", n_sos="पास में आपातकालीन अनुरोध: {c}", n_confirmed="{n} के साथ बुकिंग पक्की",
+    n_countered="{n} ने ₹{a} की जवाबी कीमत भेजी", n_travelling="{n} रास्ते में है", n_in_progress="{n} ने काम शुरू किया",
+    n_completed="काम पूरा। {n} को ₹{a} दें", n_addon="{n} ने ₹{a} अतिरिक्त शुल्क प्रस्तावित किया", n_paid="{n} से ₹{a} मिले",
+    n_review="{n} ने आपको {r}★ दिए", n_cancelled="{n} ने बुकिंग रद्द की", n_declined="{n} ने आपका अनुरोध अस्वीकार किया",
+    n_sos_accepted="{n} ने आपका आपातकालीन अनुरोध स्वीकार किया", n_waiting="{n} के जवाब का इंतज़ार", n_pending_pay="{n} से भुगतान का इंतज़ार",
     language="भाषा", footer="डेमो प्रोजेक्ट — भुगतान सिम्युलेटेड हैं।",
 )
 

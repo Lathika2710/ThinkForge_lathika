@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% block content %}
+<div class="narrow" style="max-width:720px">
 {% set view = 'worker' %}
 <h2 class="text-center my-3">{{ t('money_title') }}</h2>
 <div class="row g-2 mb-3 text-center">
@@ -9,4 +10,5 @@
 </div>
 <div class="text-center small text-muted mb-3">{{ t('reliability') }} {{ wp.reliability }}% · {% if wp.review_count %}<span class="stars">★</span> {{ wp.avg_rating }} ({{ wp.review_count }}){% else %}{{ t('no_reviews') }}{% endif %}</div>
 {% for b in rows %}{% include '_booking.html' %}{% else %}<p class="text-muted text-center">{{ t('no_money') }}</p>{% endfor %}
+</div>
 {% endblock %}

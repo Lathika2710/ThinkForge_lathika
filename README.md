@@ -18,14 +18,14 @@ Logins: admin `admin@example.com` / `ChangeMe123` (from `.env`); customer `custo
 workers `ravi.sample@example.com` (Plumber), `sunita.sample@example.com` (Electrician),
 `imran.sample@example.com` (Carpenter), `meena.sample@example.com` (Cleaner) – password `Sample123`.
 
-## How it looks (phone-first, one action at a time)
-* First visit asks **Customer or Worker**; the choice is remembered until logout.
-* Customer: tap a service icon → **Now** (SOS to every available worker of that type) or **Pick a day** (worker list → one Book
-  button → date, time, price prefilled from the worker's rate). Bottom bar: Home · Bookings · Me.
-* Worker: one big availability switch, then SOS, Today, New requests, Upcoming. Bottom bar: Jobs · Money · Me.
-* Every booking card shows **one** big button for the next step; counter-offer, extra charge, decline and cancel sit under "More".
-  The cancellation rule is shown only there, as one sentence, at the moment it matters.
-* Status is colour + icon (yellow hourglass waiting, blue van on the way, green tick done, red SOS).
+## How it looks
+* Home asks **Customer or Worker** → register (or login) → lands on the matching dashboard.
+* Top navigation: **Home · Notifications · Profile**, plus Bookings (customer) or Earnings (worker). Notifications are derived
+  from bookings (new requests, SOS, counter-offers, payments, reviews) and the red badge counts items that need a response.
+* Customer home: service icons → **Now** (SOS) or **Pick a day** (worker list → Book → short form), plus active bookings.
+* Worker home: availability switch, summary strip (today / new requests / earned), SOS, Today, Upcoming, New requests.
+* Every booking card shows **one** primary button; counter-offer, extra charge, decline and cancel sit under "More",
+  where the cancellation rule is shown as one sentence.
 
 ## 5-minute demo order
 1. Home: type the problem, pick the service → Find workers (match % + reasons)

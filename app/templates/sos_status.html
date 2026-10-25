@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% block body_attrs %}{% if b.status == 'sos_open' %}data-refresh="5000"{% endif %}{% endblock %}
 {% block content %}
+<div class="narrow" style="max-width:560px">
 {% set tip = 'tip_' + b.category.name %}
 <div class="card job card-body">
  <h4>{{ t('cat_' + b.category.name) }}</h4>
@@ -15,5 +16,6 @@
  {% else %}<p>{{ t('st_cancelled') }}</p>{% endif %}
  <div class="alert alert-warning text-start small mt-3 mb-2"><b><i class="bi bi-shield-check"></i> {{ t('sos_safety') }}:</b> {{ t(tip) if tip in ('tip_Electrician', 'tip_Plumber') else t('tip_other') }}</div>
  <div class="alert alert-secondary text-start small mb-0"><i class="bi bi-telephone-fill"></i> {{ t('sos_emergency') }}</div>
+</div>
 </div>
 {% endblock %}

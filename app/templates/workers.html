@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% block content %}
+<div class="narrow" style="max-width:720px">
 <h2 class="text-center my-3">{% if cat %}{{ t('pick_worker', c=t('cat_' + cat.name)) }}{% else %}{{ t('find_workers') }}{% endif %}</h2>
 {% for wp, score, reasons in rows %}
 <div class="card job mb-3"><div class="card-body">
@@ -22,4 +23,5 @@
 </div></div>
 {% else %}<p class="text-muted text-center">{{ t('no_workers') }}</p>{% endfor %}
 {% if cat %}<div class="text-center"><a class="small text-muted" href="{{ url_for('main.need', cid=cat.id) }}"><i class="bi bi-arrow-left"></i> {{ t('change') }}</a></div>{% endif %}
+</div>
 {% endblock %}

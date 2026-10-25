@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% block content %}
+<div class="narrow" style="max-width:560px">
 {% set cname = t('cat_' + cat.name) %}
 <div class="text-center my-3"><i class="bi {{ cat.icon }} fs-1 text-primary"></i><h2>{{ t('when_help', c=cname) }}</h2></div>
 <div class="d-grid gap-3">
@@ -13,4 +14,5 @@
 </div>
 <div class="text-center mt-3"><a class="small text-muted" href="{{ url_for('main.index') }}"><i class="bi bi-arrow-left"></i> {{ t('change') }}</a></div>
 <div class="small text-muted text-center mt-4"><i class="bi bi-telephone-fill"></i> {{ t('sos_emergency') }}</div>
+</div>
 {% endblock %}
