@@ -8,15 +8,18 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
 <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet">
 </head>
-<body data-lang="{{ lang }}" data-listening="{{ t('listening') }}" data-unsupported="{{ t('voice_unsupported') }}" {% block body_attrs %}{% endblock %}>
+<body data-lang="{{ lang }}" data-listening="{{ t('listening') }}" data-unsupported="{{ t('voice_unsupported') }}"
+      data-voice-error="{{ t('voice_error') }}" data-voice-denied="{{ t('voice_denied') }}" data-voice-network="{{ t('voice_network') }}"
+      data-voice-insecure="{{ t('voice_insecure') }}" data-voice-tap-stop="{{ t('voice_tap_stop') }}" data-voice-done="{{ t('voice_done') }}" {% block body_attrs %}{% endblock %}>
 <nav class="navbar navbar-expand-lg bg-white border-bottom mb-4">
  <div class="container">
   <a class="navbar-brand fw-bold text-primary" href="{{ url_for('main.index') }}"><i class="bi bi-tools"></i> {{ app_name }}</a>
   <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav"><span class="navbar-toggler-icon"></span></button>
   <div class="collapse navbar-collapse" id="nav">
+   {% set nav_role = g.user.role if g.user else session.get('role') %}
    <ul class="navbar-nav me-auto">
-    <li class="nav-item"><a class="nav-link" href="{{ url_for('main.workers') }}">{{ t('nav_find') }}</a></li>
-    {% if not g.user or g.user.role == 'customer' %}<li class="nav-item"><a class="nav-link text-danger fw-semibold" href="{{ url_for('main.sos') }}"><i class="bi bi-exclamation-triangle-fill"></i> {{ t('nav_sos') }}</a></li>{% endif %}
+    {% if nav_role != 'worker' %}<li class="nav-item"><a class="nav-link" href="{{ url_for('main.workers') }}">{{ t('nav_find') }}</a></li>{% endif %}
+    {% if nav_role == 'customer' %}<li class="nav-item"><a class="nav-link text-danger fw-semibold" href="{{ url_for('main.sos') }}"><i class="bi bi-exclamation-triangle-fill"></i> {{ t('nav_sos') }}</a></li>{% endif %}
     {% if g.user and g.user.role == 'customer' %}<li class="nav-item"><a class="nav-link" href="{{ url_for('main.my_bookings') }}">{{ t('nav_bookings') }}</a></li>{% endif %}
     {% if g.user and g.user.role == 'worker' %}<li class="nav-item"><a class="nav-link" href="{{ url_for('main.worker_dash') }}">{{ t('nav_dashboard') }}</a></li>{% endif %}
     {% if g.user and g.user.role == 'admin' %}<li class="nav-item"><a class="nav-link" href="{{ url_for('main.admin') }}">{{ t('nav_admin') }}</a></li>{% endif %}
@@ -25,7 +28,7 @@
     {% for code, label in LANGS.items() %}<a class="btn btn-outline-secondary {{ 'active' if code == lang }}" href="{{ url_for('main.set_lang', code=code) }}">{{ label }}</a>{% endfor %}
    </div>
    {% if g.user %}<span class="me-2 small text-muted">{{ g.user.name }}</span><a class="btn btn-sm btn-outline-dark" href="{{ url_for('main.logout') }}">{{ t('nav_logout') }}</a>
-   {% else %}<a class="btn btn-sm btn-outline-primary me-2" href="{{ url_for('main.login') }}">{{ t('nav_login') }}</a><a class="btn btn-sm btn-primary" href="{{ url_for('main.register') }}">{{ t('nav_register') }}</a>{% endif %}
+   {% else %}{% if nav_role %}<a class="btn btn-sm btn-link text-muted me-2" href="{{ url_for('main.choose_role', role='reset') }}"><i class="bi bi-arrow-left-right"></i> {{ t('switch_role') }}</a>{% endif %}<a class="btn btn-sm btn-outline-primary me-2" href="{{ url_for('main.login', role=nav_role) }}">{{ t('nav_login') }}</a><a class="btn btn-sm btn-primary" href="{{ url_for('main.register', role=nav_role) }}">{{ t('nav_register') }}</a>{% endif %}
   </div>
  </div>
 </nav>

@@ -1,11 +1,16 @@
 {% extends 'base.html' %}
 {% block content %}
 <div class="row justify-content-center"><div class="col-md-5"><div class="card card-body shadow-sm">
- <h3>{{ t('login') }}</h3>
+ <h3>{{ t('login_as', r=t('role_' + role)) }}</h3>
+ <div class="btn-group mb-3">
+  <a class="btn btn-outline-primary {{ 'active' if role == 'customer' }}" href="{{ url_for('main.login', role='customer') }}">{{ t('role_customer') }}</a>
+  <a class="btn btn-outline-primary {{ 'active' if role == 'worker' }}" href="{{ url_for('main.login', role='worker') }}">{{ t('role_worker') }}</a>
+ </div>
  <form method="post">
-  <div class="mb-3"><label class="form-label">{{ t('email') }}</label><input type="email" name="email" class="form-control" required></div>
+  <div class="mb-3"><label class="form-label">{{ t('email') }}</label><input type="email" name="email" class="form-control" required autofocus></div>
   <div class="mb-3"><label class="form-label">{{ t('password') }}</label><input type="password" name="password" class="form-control" required></div>
   <button class="btn btn-primary w-100">{{ t('login') }}</button>
  </form>
+ <div class="text-center small mt-3">{{ t('no_account') }} <a href="{{ url_for('main.register', role=role) }}">{{ t('register_here', r=t('role_' + role)) }}</a></div>
 </div></div></div>
 {% endblock %}

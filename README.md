@@ -18,6 +18,15 @@ Logins: admin `admin@example.com` / `ChangeMe123` (from `.env`); customer `custo
 workers `ravi.sample@example.com` (Plumber), `sunita.sample@example.com` (Electrician),
 `imran.sample@example.com` (Carpenter), `meena.sample@example.com` (Cleaner) – password `Sample123`.
 
+## Landing page
+The first visit asks **Customer or Worker**. Customer → home page with voice/text search and SOS. Worker → worker login,
+then the dashboard. The choice is remembered until logout; "Switch role" in the top bar resets it.
+
+## Worker dashboard
+Stats (today's jobs, upcoming, completed, earnings, awaiting payment, reliability), jobs grouped into
+**New requests / Active jobs / History**, recent reviews, tips, and an **Edit profile** form (phone, city, experience,
+price, skills, service areas). Workers do not see "Find workers" or SOS in the navigation.
+
 ## 5-minute demo order
 1. Home: speak or type the problem (mic fills text + picks the service) → Find workers (match % + reasons)
 2. Book: photo + your offered price → worker counters → customer accepts

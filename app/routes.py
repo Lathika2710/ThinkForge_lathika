@@ -50,7 +50,32 @@ def home_for(u):
 # ---------- public ----------
 @bp.route("/")
 def index():
+    # Logged-in workers/admins go straight to their page; visitors pick a role first.
+    if g.user and g.user.role in ("worker", "admin"):
+        return redirect(home_for(g.user))
+    if not g.user:
+        role = session.get("role")
+        if role == "worker":
+            return redirect(url_for("main.login", role="worker"))
+        if role != "customer":
+            return render_template("choose_role.html")
     return render_template("index.html", cats=Category.query.all())
+
+
+@bp.route("/role/<role>")
+def choose_role(role):
+    """Role picker on the landing page: remembers the choice and sends the visitor to the right page."""
+    if role == "reset":
+        session.pop("role", None)
+        return redirect(url_for("main.index"))
+    if role not in ("customer", "worker"):
+        abort(404)
+    session["role"] = role
+    if g.user:
+        return redirect(home_for(g.user))
+    if role == "worker":
+        return redirect(url_for("main.login", role="worker"))
+    return redirect(url_for("main.index"))
 
 
 @bp.route("/lang/<code>")
@@ -93,7 +118,7 @@ def register():
         db.session.commit()
         lang = session.get("lang", "en")
         session.clear()
-        session["lang"], session["uid"] = lang, u.id
+        session["lang"], session["uid"], session["role"] = lang, u.id, u.role
         msg("worker_pending" if role == "worker" else "welcome", "success")
         return redirect(home_for(u))
     return render_template("register.html", cats=cats, role=role)
@@ -101,16 +126,20 @@ def register():
 
 @bp.route("/login", methods=["GET", "POST"])
 def login():
+    role = request.args.get("role") or session.get("role") or "customer"
+    role = role if role in ("customer", "worker") else "customer"
     if request.method == "POST":
         u = User.query.filter_by(email=request.form.get("email", "").strip().lower()).first()
         if u and u.check_password(request.form.get("password", "")):
             lang = session.get("lang", "en")
             session.clear()
             session["lang"], session["uid"] = lang, u.id
+            if u.role in ("customer", "worker"):
+                session["role"] = u.role
             nxt = request.args.get("next", "")
             return redirect(nxt if nxt.startswith("/") and not nxt.startswith("//") else home_for(u))
         msg("bad_login", "danger")
-    return render_template("login.html")
+    return render_template("login.html", role=role)
 
 
 @bp.route("/logout")
@@ -284,7 +313,40 @@ def worker_dash():
         sos_open = Booking.query.filter_by(status="sos_open", category_id=wp.category_id).order_by(Booking.created_at).all()
     # Strictly bookings assigned to THIS worker.
     rows = Booking.query.filter_by(worker_id=wp.id).order_by(Booking.start.desc()).all()
-    return render_template("worker_dash.html", wp=wp, sos_open=sos_open, rows=rows)
+    today = datetime.now().date()
+    groups = dict(
+        requests=[b for b in rows if b.status in ("pending", "countered")],
+        active=sorted((b for b in rows if b.status in ("confirmed", "travelling", "in_progress")), key=lambda b: b.start),
+        history=[b for b in rows if b.status in ("completed", "paid", "cancelled", "declined")],
+    )
+    stats = dict(
+        today=sum(1 for b in groups["active"] if b.start.date() == today),
+        upcoming=sum(1 for b in groups["active"] if b.start.date() > today),
+        completed=sum(1 for b in rows if b.status in ("completed", "paid")),
+        earnings=sum(b.total for b in rows if b.status == "paid"),
+        pending_pay=sum(b.total for b in rows if b.status == "completed"),
+    )
+    reviews = Review.query.filter_by(worker_id=wp.id).order_by(Review.created_at.desc()).limit(3).all()
+    return render_template("worker_dash.html", wp=wp, sos_open=sos_open, groups=groups, stats=stats, reviews=reviews)
+
+
+@bp.route("/worker/profile", methods=["POST"])
+@login_required("worker")
+def worker_profile_edit():
+    wp, f = g.user.profile, request.form
+    price, exp = to_int(f.get("starting_price")), to_int(f.get("experience"), 0, 60)
+    phone = f.get("phone", "").strip()
+    if not price or exp is None or not (phone.isdigit() and 10 <= len(phone) <= 15):
+        msg("invalid_input", "danger")
+    else:
+        wp.starting_price, wp.experience_years = price, exp
+        wp.skills = f.get("skills", "").strip()[:250]
+        wp.service_areas = f.get("service_areas", "").strip()[:250]
+        wp.city = g.user.city = f.get("city", "").strip()[:80]
+        g.user.phone = phone
+        db.session.commit()
+        msg("profile_saved", "success")
+    return redirect(url_for("main.worker_dash"))
 
 
 @bp.route("/worker/availability", methods=["POST"])

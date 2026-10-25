@@ -6,10 +6,12 @@ document.querySelectorAll('form[method=post]').forEach(f => {
   }
 });
 
-// 2) Auto refresh (worker dashboard / SOS status) unless the user is typing
+// 2) Auto refresh (worker dashboard / SOS status) unless the user is typing or listening to the mic
 const ms = parseInt(document.body.dataset.refresh || '0');
+let micActive = false;
 if (ms) setInterval(() => {
   const a = document.activeElement;
+  if (micActive) return;
   if (!a || !['INPUT', 'TEXTAREA', 'SELECT'].includes(a.tagName)) location.reload();
 }, ms);
 
@@ -32,23 +34,73 @@ function detect(text) {
   }
   return best;
 }
+function pickCategory(btn, text) {
+  if (!btn.dataset.cat) return;
+  const sel = document.querySelector(btn.dataset.cat), cat = detect(text);
+  if (sel && cat) [...sel.options].forEach(o => { if (o.dataset.name === cat) sel.value = o.value; });
+}
+
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+const D = document.body.dataset;
+let activeRec = null;
+
 document.querySelectorAll('.mic-btn').forEach(btn => {
-  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const box = document.querySelector(btn.dataset.target);
+  if (!box) return;
+  // Status line under the input: shows "Listening…", results and clear error messages instead of failing silently.
+  const status = document.createElement('div');
+  status.className = 'voice-status small mt-1';
+  const group = btn.closest('.input-group') || btn.parentElement;
+  group.insertAdjacentElement('afterend', status);
+  const say = (text, cls) => { status.textContent = text || ''; status.className = 'voice-status small mt-1 ' + (cls || 'text-muted'); };
+  const setListening = on => {
+    micActive = on;
+    btn.classList.toggle('listening', on);
+    btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+    btn.title = on ? D.listening : '';
+  };
+
+  if (!SR) { btn.disabled = true; say(D.unsupported); return; }
+  if (!window.isSecureContext) { btn.disabled = true; say(D.voiceInsecure, 'text-danger'); return; }
+
   btn.addEventListener('click', () => {
-    if (!SR) { alert(document.body.dataset.unsupported); return; }
-    const r = new SR(); r.lang = LANGCODE[document.body.dataset.lang] || 'en-IN';
-    r.interimResults = false; r.maxAlternatives = 1;
-    btn.classList.add('active'); btn.title = document.body.dataset.listening;
+    if (activeRec) { activeRec.stop(); return; }          // second tap stops listening
+    const r = new SR();
+    r.lang = LANGCODE[D.lang] || 'en-IN';
+    r.interimResults = true; r.maxAlternatives = 1; r.continuous = false;
+    let finalText = '', gotError = false;
+
+    r.onstart = () => { activeRec = r; setListening(true); say(D.listening + ' (' + D.voiceTapStop + ')', 'text-primary'); };
     r.onresult = e => {
-      const text = e.results[0][0].transcript;
-      const box = document.querySelector(btn.dataset.target); box.value = text;
-      if (btn.dataset.cat) {
-        const sel = document.querySelector(btn.dataset.cat), cat = detect(text);
-        if (cat) [...sel.options].forEach(o => { if (o.dataset.name === cat) sel.value = o.value; });
-      }
+      let interim = '';
+      for (const res of e.results) { if (res.isFinal) finalText += res[0].transcript + ' '; else interim += res[0].transcript; }
+      box.value = (finalText || interim).trim();
     };
-    r.onend = () => btn.classList.remove('active');
-    r.onerror = () => btn.classList.remove('active');
-    r.start();
+    r.onerror = e => {
+      gotError = true;
+      const code = e.error || '';
+      if (code === 'not-allowed' || code === 'service-not-allowed') say(D.voiceDenied, 'text-danger');
+      else if (code === 'network') say(D.voiceNetwork, 'text-danger');
+      else if (code === 'aborted') say('');
+      else if (code === 'language-not-supported' && r.lang !== 'en-IN') {
+        // Retry once in English if the chosen UI language has no speech model.
+        activeRec = null; setListening(false);
+        const r2 = new SR(); Object.assign(r2, {lang: 'en-IN', interimResults: true, maxAlternatives: 1});
+        r2.onstart = r.onstart; r2.onresult = r.onresult; r2.onerror = () => say(D.voiceError, 'text-danger'); r2.onend = r.onend;
+        try { r2.start(); } catch (err) { say(D.voiceError, 'text-danger'); }
+      }
+      else say(D.voiceError, 'text-danger');
+    };
+    r.onend = () => {
+      activeRec = null; setListening(false);
+      const text = box.value.trim();
+      if (text) {
+        pickCategory(btn, text);
+        box.dispatchEvent(new Event('input', {bubbles: true}));
+        if (!gotError) say(D.voiceDone, 'text-success');
+        box.focus();
+      } else if (!gotError) say(D.voiceError, 'text-danger');
+    };
+    try { r.start(); } catch (err) { say(D.voiceError, 'text-danger'); }
   });
 });
