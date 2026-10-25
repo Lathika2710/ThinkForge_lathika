@@ -4,11 +4,7 @@
  <h4>{{ t('book_now') }} — {{ wp.user.name }} <small class="text-muted">({{ t('cat_' + wp.category.name) }})</small></h4>
  <form method="post" enctype="multipart/form-data" autocomplete="off">
   <label class="form-label fw-semibold">{{ t('describe_problem') }}</label>
-  <div class="input-group mb-1">
-   <textarea id="problem" name="problem" class="form-control" rows="3" maxlength="1000" required>{{ request.form.get('problem', '') }}</textarea>
-   <button type="button" class="btn btn-outline-primary mic-btn" data-target="#problem"><i class="bi bi-mic-fill"></i></button>
-  </div>
-  <div class="form-text mb-3">{{ t('mic_tip') }}</div>
+  <textarea id="problem" name="problem" class="form-control mb-3" rows="3" maxlength="1000" required>{{ request.form.get('problem', '') }}</textarea>
   <label class="form-label fw-semibold">{{ t('upload_photo') }}</label>
   <input type="file" name="photo" accept="image/png,image/jpeg" class="form-control">
   <div class="form-text mb-3"><i class="bi bi-camera"></i> {{ t('photo_help') }}</div>

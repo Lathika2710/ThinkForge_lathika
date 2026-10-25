@@ -13,5 +13,3 @@ body{background:#f6f8fb}
 .role-card>i{font-size:3.5rem}
 .stat-card{border:0;box-shadow:0 1px 3px rgba(0,0,0,.08)}
 .stat-num{font-size:1.4rem;font-weight:700;line-height:1.2}
-.mic-btn.listening{background:#dc3545;border-color:#dc3545;color:#fff;animation:pulse 1s infinite}
-@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(220,53,69,.5)}70%{box-shadow:0 0 0 .6rem rgba(220,53,69,0)}100%{box-shadow:0 0 0 0 rgba(220,53,69,0)}}

@@ -19,7 +19,7 @@ workers `ravi.sample@example.com` (Plumber), `sunita.sample@example.com` (Electr
 `imran.sample@example.com` (Carpenter), `meena.sample@example.com` (Cleaner) – password `Sample123`.
 
 ## Landing page
-The first visit asks **Customer or Worker**. Customer → home page with voice/text search and SOS. Worker → worker login,
+The first visit asks **Customer or Worker**. Customer → home page with search and SOS. Worker → worker login,
 then the dashboard. The choice is remembered until logout; "Switch role" in the top bar resets it.
 
 ## Worker dashboard
@@ -28,7 +28,7 @@ Stats (today's jobs, upcoming, completed, earnings, awaiting payment, reliabilit
 price, skills, service areas). Workers do not see "Find workers" or SOS in the navigation.
 
 ## 5-minute demo order
-1. Home: speak or type the problem (mic fills text + picks the service) → Find workers (match % + reasons)
+1. Home: type the problem, pick the service → Find workers (match % + reasons)
 2. Book: photo + your offered price → worker counters → customer accepts
 3. SOS: choose ONE thing (worker type) → open the Electrician worker's dashboard → Accept (first wins)
 4. Worker: On the way → Start → propose extra charge (with reason) → customer accepts → Complete
@@ -40,5 +40,5 @@ price, skills, service areas). Workers do not see "Find workers" or SOS in the n
 * Worker cancelling lowers the **reliability** score (completed ÷ (completed + worker cancels)).
 * Double-booking: overlapping 2-hour slots are rejected; SOS acceptance and booking actions lock the row.
 * Customers only see their own bookings; workers only see bookings assigned to them (plus open SOS for their trade).
-* Payments are simulated. Voice uses the browser's speech recognition (Chrome/Edge, needs internet) – typing always works.
+* Payments are simulated.
 * Hidden on purpose (not built): complaints, disputes, no-show reports, review moderation, document upload.

@@ -6,8 +6,6 @@ EN = dict(
     nav_admin="Admin", nav_login="Login", nav_register="Register", nav_logout="Logout",
     hero_title="The right worker, at a fair price, fast.",
     hero_sub="Tell us the problem, attach a photo, and get matched with a trusted local worker.",
-    speak_problem="Speak or type your problem", mic_tip="Tap the mic and speak (works best in Chrome / Edge)",
-    listening="Listening…", voice_unsupported="Voice is not supported in this browser — please type.",
     find_workers="Find workers", category="Service type", area="Your area / PIN code", search="Search",
     sos_button="SOS – Urgent help", sos_q="What kind of worker do you need right now?", sos_send="Send SOS",
     sos_sub="Your request goes to every available worker of this type. The first one to accept gets the job.",
@@ -82,11 +80,8 @@ EN = dict(
     tip_photo="Reply to requests quickly — customers pick the first worker who answers.",
     tip_areas="Add all the areas and PIN codes you serve to rank higher in search.",
     tip_reliable="Avoid cancelling confirmed jobs; your reliability score is shown to customers.",
-    # voice
-    voice_error="Could not hear anything. Try again or type.",
-    voice_denied="Microphone access is blocked. Allow the mic for this site and try again.",
-    voice_network="Voice needs an internet connection.", voice_insecure="Voice works only on https or localhost.",
-    voice_tap_stop="tap the mic again to stop", voice_done="Got it! Check the text and search.",
+
+
     language="Language", footer="Demo project — payments are simulated.",
 )
 
@@ -96,9 +91,7 @@ TA = dict(
     nav_logout="வெளியேறு",
     hero_title="சரியான பணியாளர், நியாயமான விலை, உடனடியாக.",
     hero_sub="பிரச்சனையைச் சொல்லுங்கள், புகைப்படம் இணையுங்கள், நம்பகமான உள்ளூர் பணியாளரைப் பெறுங்கள்.",
-    speak_problem="உங்கள் பிரச்சனையைப் பேசுங்கள் அல்லது தட்டச்சு செய்யுங்கள்",
-    mic_tip="மைக்கை அழுத்திப் பேசுங்கள் (Chrome / Edge-ல் சிறப்பாக வேலை செய்யும்)",
-    listening="கேட்கிறது…", voice_unsupported="இந்த உலாவியில் குரல் வசதி இல்லை — தயவுசெய்து தட்டச்சு செய்யுங்கள்.",
+
     find_workers="பணியாளர்களைத் தேடு", category="சேவை வகை", area="உங்கள் பகுதி / அஞ்சல் குறியீடு", search="தேடு",
     sos_button="அவசரம் – உடனடி உதவி", sos_q="இப்போது உங்களுக்கு எந்த வகை பணியாளர் தேவை?",
     sos_send="அவசர கோரிக்கை அனுப்பு",
@@ -179,10 +172,8 @@ TA = dict(
     tip_photo="கோரிக்கைகளுக்கு விரைவாக பதிலளிக்கவும் — முதலில் பதிலளிக்கும் பணியாளரையே வாடிக்கையாளர்கள் தேர்வு செய்கிறார்கள்.",
     tip_areas="தேடலில் மேலே வர நீங்கள் சேவை செய்யும் அனைத்துப் பகுதிகள் மற்றும் அஞ்சல் குறியீடுகளையும் சேர்க்கவும்.",
     tip_reliable="உறுதி செய்த வேலைகளை ரத்து செய்யாதீர்கள்; உங்கள் நம்பகத்தன்மை மதிப்பெண் வாடிக்கையாளர்களுக்குக் காட்டப்படும்.",
-    voice_error="எதுவும் கேட்கவில்லை. மீண்டும் முயலுங்கள் அல்லது தட்டச்சு செய்யுங்கள்.",
-    voice_denied="மைக்ரோஃபோன் அணுகல் தடுக்கப்பட்டுள்ளது. இந்தத் தளத்திற்கு மைக்கை அனுமதித்து மீண்டும் முயலுங்கள்.",
-    voice_network="குரல் வசதிக்கு இணைய இணைப்பு தேவை.", voice_insecure="குரல் வசதி https அல்லது localhost-ல் மட்டுமே வேலை செய்யும்.",
-    voice_tap_stop="நிறுத்த மைக்கை மீண்டும் அழுத்துங்கள்", voice_done="பெற்றாகிவிட்டது! உரையைச் சரிபார்த்துத் தேடுங்கள்.",
+
+
     language="மொழி", footer="டெமோ திட்டம் — பணம் செலுத்துதல் உருவகம்.",
 )
 
@@ -191,8 +182,6 @@ HI = dict(
     nav_dashboard="डैशबोर्ड", nav_admin="एडमिन", nav_login="लॉगिन", nav_register="रजिस्टर", nav_logout="लॉगआउट",
     hero_title="सही कारीगर, सही दाम, तुरंत।",
     hero_sub="समस्या बताइए, फोटो जोड़िए और अपने पास का भरोसेमंद कारीगर पाइए।",
-    speak_problem="अपनी समस्या बोलें या लिखें", mic_tip="माइक दबाकर बोलें (Chrome / Edge में सबसे अच्छा चलता है)",
-    listening="सुन रहा है…", voice_unsupported="इस ब्राउज़र में आवाज़ की सुविधा नहीं है — कृपया टाइप करें।",
     find_workers="कारीगर खोजें", category="सेवा का प्रकार", area="आपका इलाका / पिन कोड", search="खोजें",
     sos_button="आपातकाल – तुरंत मदद", sos_q="आपको अभी किस तरह का कारीगर चाहिए?", sos_send="आपातकालीन अनुरोध भेजें",
     sos_sub="आपका अनुरोध इस प्रकार के सभी उपलब्ध कारीगरों को जाएगा। जो पहले स्वीकार करेगा उसे काम मिलेगा।",
@@ -268,10 +257,8 @@ HI = dict(
     tip_photo="अनुरोधों का जल्दी जवाब दें — ग्राहक सबसे पहले जवाब देने वाले कारीगर को चुनते हैं।",
     tip_areas="खोज में ऊपर आने के लिए अपने सभी सेवा क्षेत्र और पिन कोड जोड़ें।",
     tip_reliable="पक्के काम रद्द न करें; आपका भरोसे का स्कोर ग्राहकों को दिखता है।",
-    voice_error="कुछ सुनाई नहीं दिया। दोबारा कोशिश करें या टाइप करें।",
-    voice_denied="माइक्रोफ़ोन की अनुमति नहीं है। इस साइट के लिए माइक की अनुमति दें और दोबारा कोशिश करें।",
-    voice_network="आवाज़ के लिए इंटरनेट कनेक्शन चाहिए।", voice_insecure="आवाज़ केवल https या localhost पर चलती है।",
-    voice_tap_stop="रोकने के लिए माइक फिर दबाएँ", voice_done="मिल गया! टेक्स्ट जाँचें और खोजें।",
+
+
     language="भाषा", footer="डेमो प्रोजेक्ट — भुगतान सिम्युलेटेड हैं।",
 )
 
